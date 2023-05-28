@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "cosmerecraft:iron_ring",
+    "cosmerecraft:steel_ring",
+    "cosmerecraft:copper_ring",
+    "cosmerecraft:bronze_ring",
+    "cosmerecraft:zinc_ring",
+    "cosmerecraft:brass_ring",
+    "cosmerecraft:gold_ring",
+    "cosmerecraft:electrum_ring",
+    "cosmerecraft:aluminum_ring",
+    "cosmerecraft:duralumin_ring",
+    "cosmerecraft:cadmium_ring",
+    "cosmerecraft:bendalloy_ring",
+    "cosmerecraft:chromium_ring",
+    "cosmerecraft:nicrosil_ring",
+    "cosmerecraft:tin_ring",
+    "cosmerecraft:pewter_ring"
+  ]
+}
