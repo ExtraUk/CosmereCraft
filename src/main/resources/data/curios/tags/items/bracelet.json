@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "cosmerecraft:iron_bracelet",
+    "cosmerecraft:steel_bracelet",
+    "cosmerecraft:copper_bracelet",
+    "cosmerecraft:bronze_bracelet",
+    "cosmerecraft:zinc_bracelet",
+    "cosmerecraft:brass_bracelet",
+    "cosmerecraft:gold_bracelet",
+    "cosmerecraft:electrum_bracelet",
+    "cosmerecraft:aluminum_bracelet",
+    "cosmerecraft:duralumin_bracelet",
+    "cosmerecraft:cadmium_bracelet",
+    "cosmerecraft:bendalloy_bracelet",
+    "cosmerecraft:chromium_bracelet",
+    "cosmerecraft:nicrosil_bracelet",
+    "cosmerecraft:tin_bracelet",
+    "cosmerecraft:pewter_bracelet"
+  ]
+}

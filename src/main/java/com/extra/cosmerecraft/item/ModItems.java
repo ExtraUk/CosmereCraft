@@ -48,4 +48,21 @@ public class ModItems {
     public static final RegistryObject<Item> BRONZE_RING = ITEMS.register("bronze_ring", () -> new BronzeMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
     public static final RegistryObject<Item> ALUMINUM_RING = ITEMS.register("aluminum_ring", () -> new AluminumMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
     public static final RegistryObject<Item> DURALUMIN_RING = ITEMS.register("duralumin_ring", () -> new DuraluminMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+
+    public static final RegistryObject<Item> IRON_BRACELET = ITEMS.register("iron_bracelet", () -> new IronMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> STEEL_BRACELET = ITEMS.register("steel_bracelet", () -> new SteelMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> TIN_BRACELET = ITEMS.register("tin_bracelet", () -> new TinMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> PEWTER_BRACELET = ITEMS.register("pewter_bracelet", () -> new PewterMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> ZINC_BRACELET = ITEMS.register("zinc_bracelet", () -> new ZincMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> BRASS_BRACELET = ITEMS.register("brass_bracelet", () -> new BrassMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> GOLD_BRACELET = ITEMS.register("gold_bracelet", () -> new GoldMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> ELECTRUM_BRACELET = ITEMS.register("electrum_bracelet", () -> new ElectrumMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> CHROMIUM_BRACELET = ITEMS.register("chromium_bracelet", () -> new ChromiumMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> NICROSIL_BRACELET = ITEMS.register("nicrosil_bracelet", () -> new NicrosilMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> CADMIUM_BRACELET = ITEMS.register("cadmium_bracelet", () -> new CadmiumMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> BENDALLOY_BRACELET = ITEMS.register("bendalloy_bracelet", () -> new BendalloyMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> COPPER_BRACELET = ITEMS.register("copper_bracelet", () -> new CopperMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> BRONZE_BRACELET = ITEMS.register("bronze_bracelet", () -> new BronzeMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> ALUMINUM_BRACELET = ITEMS.register("aluminum_bracelet", () -> new AluminumMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> DURALUMIN_BRACELET = ITEMS.register("duralumin_bracelet", () -> new DuraluminMetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
 }

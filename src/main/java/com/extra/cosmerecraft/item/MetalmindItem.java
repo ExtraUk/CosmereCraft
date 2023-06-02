@@ -9,6 +9,6 @@ public class MetalmindItem extends Item implements ICurioItem {
     private int key = 0;
 
     public MetalmindItem(Properties properties) {
-        super(properties);
+        super(properties.stacksTo(1));
     }
 }
