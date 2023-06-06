@@ -3,6 +3,7 @@ package com.extra.cosmerecraft.api.data;
 import com.extra.cosmerecraft.api.enums.Metal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public interface IFeruchemyData {
     /**
@@ -82,36 +83,24 @@ public interface IFeruchemyData {
     void setUninvested();
 
     boolean isUninvested();
-    /**
-     * Sets the players amount of Metal to the given value
-     *
-     * param metal the Metal to set
-     * param amt   the amount stored
-     */
-    /*void setAmount(Metal metal, int amt);
 
-    /**
-     * Gets the players stored amount of the given metal
-     *
-     * param metal the Metal to check
-     * return the amount stored
+    //returns true if player has a metalmind of param metal equipped
+    boolean hasMetalmind(Metal metal, ServerPlayer player);
 
-    int getAmount(Metal metal);
+    //returns true if all metalminds of param metal are full
+    boolean areMetalmindsFull(Metal metal, ServerPlayer player);
 
-    /**
-     * Drain all specified metals
-     *
-     * param metals all metals to drain
-     *
-    void drainMetals(Metal... metals);
+    //returns charges of the top-most not full metalmind of param metal, if all metalminds are full returns charges of top-most metalmind of param metal
+    int getMetalmindCharges(Metal metal, ServerPlayer player);
 
-    void decEnhanced();
-
-    boolean isEnhanced();
-
-    void setEnhanced(int time);*/
+    //adjusts charges of top-most metalmind of param metal
+    void adjustMetalmindCharges(Metal metal, int tappingLevel, ServerPlayer player);
 
     void load(CompoundTag nbt);
 
     CompoundTag save();
+
+    void setBronzeSleepingTime(Player player, long dayTime);
+
+    void setBronzeWakeUpCharges(Player player, long dayTime);
 }

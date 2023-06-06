@@ -3,7 +3,6 @@ package com.extra.cosmerecraft.event;
 import com.extra.cosmerecraft.CosmereCraft;
 import com.extra.cosmerecraft.client.KeyBindings;
 import com.extra.cosmerecraft.client.gui.FeruchemySelectScreen;
-import com.extra.cosmerecraft.network.ModMessages;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

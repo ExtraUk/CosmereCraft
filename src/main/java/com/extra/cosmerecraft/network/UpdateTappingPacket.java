@@ -2,9 +2,11 @@ package com.extra.cosmerecraft.network;
 
 import com.extra.cosmerecraft.api.data.IFeruchemyData;
 import com.extra.cosmerecraft.api.enums.Metal;
+import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.util.NonNullConsumer;
@@ -13,6 +15,8 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
+
+import static com.extra.cosmerecraft.feruchemy.data.DefaultFeruchemistData.removeEffects;
 
 public class UpdateTappingPacket {
     private final Metal mt;
@@ -42,46 +46,23 @@ public class UpdateTappingPacket {
 
             player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
                 int tappingLevel = this.level+this.mouseButton;
-                if (data.hasPower(this.mt) /*&& data.getAmount(this.mt) > 0*/) {
+                if (data.hasPower(this.mt)){
                     data.setTappingLevel(this.mt, tappingLevel);
-                        removeEffects(player, data, mt);
+                    if(this.mt == Metal.ATIUM) {
+                        player.hurt(DamageSource.GENERIC, (float) 0.001);
+                    }
+                    if(this.mt == Metal.CADMIUM && tappingLevel < 0){
+                        player.setAirSupply(player.getAirSupply()+tappingLevel);
+                    }
                 }
                 else {
                     data.setTappingLevel(this.mt, 0);
-                    removeEffects(player, data, mt);
                 }
+                removeEffects(player, mt);
                 ModMessages.sync(data, player);
             });
 
         });
         ctx.get().setPacketHandled(true);
-    }
-
-    public void removeEffects(ServerPlayer player, IFeruchemyData data, Metal metal){
-        if(metal.getName().equals("tin")){
-            player.removeEffect(MobEffects.BLINDNESS);
-            player.removeEffect(MobEffects.NIGHT_VISION);
-        }
-        else if(metal.getName().equals("pewter")){
-            player.removeEffect(MobEffects.DAMAGE_BOOST);
-            player.removeEffect(MobEffects.WEAKNESS);
-            player.removeEffect(MobEffects.DIG_SLOWDOWN);
-        }
-        else if(metal.getName().equals("iron")){
-            player.removeEffect(MobEffects.SLOW_FALLING);
-            player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
-        }
-        else if(metal.getName().equals("steel")){
-            player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
-            player.removeEffect(MobEffects.MOVEMENT_SPEED);
-        }
-        else if(metal.getName().equals("chromium")){
-            player.removeEffect(MobEffects.LUCK);
-            player.removeEffect(MobEffects.UNLUCK);
-        }
-        else if(metal.getName().equals("duralumin")){
-            player.removeEffect(MobEffects.BAD_OMEN);
-            player.removeEffect(MobEffects.HERO_OF_THE_VILLAGE);
-        }
     }
 }

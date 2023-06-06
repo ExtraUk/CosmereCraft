@@ -4,10 +4,12 @@ import com.extra.cosmerecraft.client.KeyBindings;
 import com.extra.cosmerecraft.command.CommandSetup;
 import com.extra.cosmerecraft.command.FeruchemyPowerType;
 import com.extra.cosmerecraft.command.PowerCommand;
+import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.event.ClientEvents;
 import com.extra.cosmerecraft.event.CommonEventHandler;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
+import com.extra.cosmerecraft.loot.LootModifierRegistry;
 import com.extra.cosmerecraft.network.ModMessages;
 import com.google.common.graph.Network;
 import com.mojang.logging.LogUtils;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -50,6 +53,8 @@ public class CosmereCraft
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModItems.register(modEventBus);
+        ModEffects.register(modEventBus);
+        LootModifierRegistry.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::enqueueIMC);
         modEventBus.addListener(CosmereCraft::init);
@@ -68,7 +73,7 @@ public class CosmereCraft
 
     public void enqueueIMC(final InterModEnqueueEvent event) {
         InterModComms.sendTo(CuriosApi.MODID, SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.RING.getMessageBuilder().size(12).build());
-        InterModComms.sendTo(CuriosApi.MODID, SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BRACELET.getMessageBuilder().size(4).build());
+        InterModComms.sendTo(CuriosApi.MODID, SlotTypeMessage.REGISTER_TYPE, () -> SlotTypePreset.BRACELET.getMessageBuilder().size(6).build());
     }
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

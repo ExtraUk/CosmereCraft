@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import org.lwjgl.opengl.GL11;
@@ -22,6 +23,10 @@ import java.util.Arrays;
 public class FeruchemySelectScreen extends Screen {
 
     private static final String[] METALS = Arrays.stream(Metal.values()).map(Metal::getName).toArray(String[]::new);
+    private static final String[] METAL_NAMES = Arrays.stream(Metal.values()).map(Metal::getName).toArray(String[]::new);
+    private static final String[] METAL_LOCAL = Arrays.stream(METAL_NAMES).map(s -> "metals." + s).toArray(String[]::new);
+    private static final String GUI_METAL = "cosmerecraft:textures/gui/metals/%s_feruchemy.png";
+    private static final ResourceLocation[] METAL_ICONS = Arrays.stream(METAL_NAMES).map(s -> new ResourceLocation(String.format(GUI_METAL, s))).toArray(ResourceLocation[]::new);
     final Minecraft mc;
     int slotSelected = -1;
 
@@ -109,7 +114,7 @@ public class FeruchemySelectScreen extends Screen {
 
             float xsp = xp - 4;
             float ysp = yp;
-            /*String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
+            String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
             int textwidth = this.mc.font.width(name);
 
             if (xsp < x) {
@@ -119,13 +124,13 @@ public class FeruchemySelectScreen extends Screen {
                 ysp -= 9;
             }
 
-            this.mc.font.drawShadow(matrixStack, name, xsp, ysp, 0xFFFFFF);*/
+            this.mc.font.drawShadow(matrixStack, name, xsp, ysp, 0xFFFFFF);
 
             double mod = 0.8;
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            //RenderSystem.setShaderTexture(0, METAL_ICONS[toMetalIndex(seg)]);
+            RenderSystem.setShaderTexture(0, METAL_ICONS[toMetalIndex(seg)]);
             blit(matrixStack, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
         }
@@ -164,10 +169,7 @@ public class FeruchemySelectScreen extends Screen {
 
     public static void changeTapping(Metal metal, IFeruchemyData capability, int mouseButton) {
         int modificator = mouseButton == 0 ? 1 : -1;
-        System.out.println(modificator);
-        System.out.println(capability.hasPower(metal));
-        System.out.println(capability.tappingLevel(metal));
-        if (!capability.hasPower(metal) || (capability.tappingLevel(metal) + modificator > 3 && modificator == 1) || (capability.tappingLevel(metal) + modificator < -1 && modificator == -1)) {
+        if (!capability.hasPower(metal) || (capability.tappingLevel(metal) + modificator > 3 && modificator == 1) || (capability.tappingLevel(metal) + modificator < metal.getMinTap() && modificator == -1)) {
             return;
         }
         ModMessages.sendToServer(new UpdateTappingPacket(metal, capability.tappingLevel(metal), modificator));
