@@ -25,7 +25,7 @@ public class FeruchemySelectScreen extends Screen {
 
     private static final String[] METALS = Arrays.stream(Metal.values()).map(Metal::getName).toArray(String[]::new);
     private static final String[] METAL_NAMES = Arrays.stream(Metal.values()).map(Metal::getName).toArray(String[]::new);
-    private static final String[] METAL_LOCAL = Arrays.stream(METAL_NAMES).map(s -> "metals." + s).toArray(String[]::new);
+    private static final String[] METAL_LOCAL = Arrays.stream(METAL_NAMES).map(s -> "metals.cosmerecraft." + s).toArray(String[]::new);
     private static final String GUI_METAL = "cosmerecraft:textures/gui/metals/%s_feruchemy.png";
     private static final ResourceLocation[] METAL_ICONS = Arrays.stream(METAL_NAMES).map(s -> new ResourceLocation(String.format(GUI_METAL, s))).toArray(ResourceLocation[]::new);
     final Minecraft mc;
@@ -133,7 +133,7 @@ public class FeruchemySelectScreen extends Screen {
 
                 float xsp = xp - 4;
                 float ysp = yp;
-                String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable("cosmerecraft."+METAL_LOCAL[toMetalIndex(seg)]).getString();
+                String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
                 int textwidth = this.mc.font.width(name);
                 if (xsp < x) {
                     xsp -= textwidth - 8;

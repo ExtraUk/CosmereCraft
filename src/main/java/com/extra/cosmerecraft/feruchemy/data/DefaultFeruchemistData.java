@@ -27,6 +27,7 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     private final int[] tapping_metals;
     private boolean wasTappingNicrosil = false;
     private boolean flag = false;
+    private boolean wasInvested = false;
 
     public DefaultFeruchemistData(){
         int powers = Metal.values().length;
@@ -541,9 +542,6 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     @Override
     public void setTappingLevel(Metal metal, int tappingLevel) {
         this.tapping_metals[metal.getIndex()] = tappingLevel;
-        /*if(metal == Metal.NICROSIL && tappingLevel > 0){
-            this.wasTappingNicrosil = true;
-        }*/
     }
 
     @Override
@@ -573,5 +571,15 @@ public class DefaultFeruchemistData implements IFeruchemyData {
         ItemStack offHand = player.getOffhandItem();
         ItemStack hand = player.getMainHandItem();
         return offHand.getItem().equals(ModItems.BANDS_OF_MOURNING.get()) || hand.getItem().equals(ModItems.BANDS_OF_MOURNING.get());
+    }
+
+    @Override
+    public boolean wasEverInvested(){
+        return wasInvested;
+    }
+
+    @Override
+    public void investFirstTime(){
+        wasInvested = true;
     }
 }

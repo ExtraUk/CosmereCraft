@@ -14,6 +14,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.util.NonNullConsumer;
 
@@ -89,35 +90,32 @@ public class PowerCommand {
     }
 
     private static void getPowers(CommandContext<CommandSourceStack> ctx, ServerPlayer player) {
-        StringBuilder powers = new StringBuilder();
+        MutableComponent component = Component.translatable("commands.cosmerecraft.getpowers").append(player.getDisplayName().getString() + ": ");
         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
             if (data.isFeruchemist()) {
-                powers.append("all");
+                component.append(Component.translatable("commands.cosmerecraft.all"));
             } else if (data.isUninvested()) {
-                powers.append("none");
+                component.append(Component.translatable("commands.cosmerecraft.none"));
             } else {
                 for (Metal mt : Metal.values()) {
                     if (data.hasPower(mt)) {
-                        if (powers.isEmpty()) {
-                            powers.append(mt.getName());
-                        } else {
-                            powers.append(", ").append(mt.getName());
-                        }
+                        component.append(Component.translatable("metals.cosmerecraft."+mt.getName()).append(", "));
                     }
                 }
             }
         });
-        ctx.getSource().sendSuccess(Component.translatable("commands.feruchemy.getpowers", player.getDisplayName(), powers.toString()), true);
+
+        ctx.getSource().sendSuccess(component, true);
     }
 
     private static void addPower(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
         handlePowerChange(ctx, player, IFeruchemyData::setFeruchemist, data -> Predicate.not(data::hasPower), mt -> (data -> data.addPower(mt)), ERROR_CANT_ADD::create,
-                "commands.feruchemy.addpower");
+                "commands.cosmerecraft.addpower");
     }
 
     private static void removePower(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
         handlePowerChange(ctx, player, IFeruchemyData::setUninvested, (data) -> data::hasPower, (mt) -> (data -> data.revokePower(mt)), ERROR_CANT_REMOVE::create,
-                "commands.feruchemy.removepower");
+                "commands.cosmerecraft.removepower");
     }
 
     private static void handlePowerChange(CommandContext<CommandSourceStack> ctx,

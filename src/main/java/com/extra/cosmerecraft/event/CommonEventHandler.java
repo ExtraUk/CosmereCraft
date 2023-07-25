@@ -27,6 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.feature.stateproviders.RandomizedIntStateProvider;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -44,6 +45,7 @@ import net.minecraftforge.registries.RegisterEvent;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
+import java.util.Random;
 
 public class CommonEventHandler {
 
@@ -209,10 +211,15 @@ public class CommonEventHandler {
             return;
         }
         if (event.getEntity() instanceof ServerPlayer player) {
+
             player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
-                if (data.isUninvested()) {
-                    for(Metal metal: Metal.values()) {
-                        data.addPower(metal);
+                if (!data.wasEverInvested()) {
+                    Random rand = new Random();
+                    if(rand.nextInt(16) == 0){
+                        data.setFeruchemist();
+                    }
+                    else{
+                        data.addPower(Metal.getMetal(rand.nextInt(Metal.values().length)));
                     }
                 }
             });

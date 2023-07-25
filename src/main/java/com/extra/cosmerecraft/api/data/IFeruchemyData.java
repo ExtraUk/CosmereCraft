@@ -122,4 +122,8 @@ public interface IFeruchemyData {
     void setBronzeWakeUpCharges(Player player, long dayTime);
 
     int getAllCharges(Metal metal, LocalPlayer player);
+
+    boolean wasEverInvested();
+
+    void investFirstTime();
 }
