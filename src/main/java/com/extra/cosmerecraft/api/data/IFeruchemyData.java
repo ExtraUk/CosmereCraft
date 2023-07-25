@@ -23,6 +23,12 @@ public interface IFeruchemyData {
      */
     boolean hasPower(Metal metal);
 
+    boolean hasPowerNicrosil(Metal metal);
+
+    boolean hasPowerHemalurgy(Metal metal);
+
+    boolean hasPowerDefault(Metal metal);
+
     /**
      * Get the number of powers the player has
      *
@@ -56,12 +62,20 @@ public interface IFeruchemyData {
      */
     void addPower(Metal metal);
 
+    void addPowerNicrosil(Metal metal);
+
+    void addPowerHemalurgy(Metal metal);
+
     /**
      * Remove the given metal power from this player
      *
      * param metal the Metal to remove
      */
     void revokePower(Metal metal);
+
+    void revokePowerNicrosil(Metal metal);
+
+    void revokePowerHemalurgy(Metal metal);
 
     /**
      * Checks if the player is tapping/storing the given metal
@@ -78,6 +92,8 @@ public interface IFeruchemyData {
      * param tappingLevel the level to set it to
      */
     void setTappingLevel(Metal metal, int tappingLevel);
+
+    void stopTapping(ServerPlayer player);
 
 
     void setUninvested();

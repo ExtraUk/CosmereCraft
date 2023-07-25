@@ -1,0 +1,21 @@
+{
+  "type": "cosmerecraft:alloying_furnace",
+  "ingredients": [
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:iron_ingot"
+    },
+    {
+      "item": "minecraft:coal"
+    },
+    {
+      "item": "minecraft:coal"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:steel_ingot",
+    "count": 2
+  }
+}

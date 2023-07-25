@@ -1,0 +1,21 @@
+{
+  "type": "cosmerecraft:alloying_furnace",
+  "ingredients": [
+    {
+      "item": "cosmerecraft:aluminum_ingot"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:duralumin_ingot",
+    "count": 4
+  }
+}

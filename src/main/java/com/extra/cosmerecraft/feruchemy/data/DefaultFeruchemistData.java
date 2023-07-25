@@ -21,12 +21,20 @@ import java.util.List;
 public class DefaultFeruchemistData implements IFeruchemyData {
 
     private final boolean[] feruchemical_powers;
+    private final boolean[] feruchemical_powers_hemalurgy;
+    private final boolean[] feruchemical_powers_nicrosil;
     private final int[] tapping_metals;
+    private boolean wasTappingNicrosil = false;
+    private boolean flag = false;
 
     public DefaultFeruchemistData(){
         int powers = Metal.values().length;
         this.feruchemical_powers = new boolean[powers];
+        this.feruchemical_powers_nicrosil = new boolean[powers];
+        this.feruchemical_powers_hemalurgy = new boolean[powers];
         Arrays.fill(this.feruchemical_powers, false);
+        Arrays.fill(this.feruchemical_powers_nicrosil, false);
+        Arrays.fill(this.feruchemical_powers_hemalurgy, false);
 
         this.tapping_metals = new int[powers];
         Arrays.fill(this.tapping_metals, 0);
@@ -36,29 +44,63 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     public void tickTapStore(ServerPlayer player) {
         boolean sync = false;
         if(!hasBandsOfMourning(player)) {
-            for (Metal metal : Metal.values()) {
-                int tappingLevel = this.tappingLevel(metal);
-                if (tappingLevel != 0) {
-                    if (!this.hasPower(metal) || !this.hasMetalmind(metal, player) || (tappingLevel < 0 && ((metal == Metal.COPPER && player.totalExperience <= 0 && player.experienceLevel <= 0) || metal == Metal.BENDALLOY && player.getFoodData().getFoodLevel() <= 0))) {
-                        this.setTappingLevel(metal, 0);
-                        removeEffects(player, metal);
-                        sync = true;
-                    } else {
-                        if ((tappingLevel > 0 && this.getMetalmindCharges(metal, player) <= 0) || (tappingLevel < 0 && this.areMetalmindsFull(metal, player))) {
-                            this.setTappingLevel(metal, 0);
-                            removeEffects(player, metal);
-                            sync = true;
-                        } else {
-                            if(metal == Metal.GOLD) this.adjustGold(player, tappingLevel);
-                            if(metal == Metal.BENDALLOY) this.adjustBendalloy(player, tappingLevel);
-
-                            adjustMetalmindCharges(metal, tappingLevel, player);
+            if(this.tappingLevel(Metal.NICROSIL) >= 0) {
+                for (Metal metal : Metal.values()) {
+                    int tappingLevel = this.tappingLevel(metal);
+                    if (metal != Metal.NICROSIL || tappingLevel > 0) {
+                        int charges = this.getMetalmindCharges(metal, player);
+                        if (tappingLevel != 0) {
+                            if (!this.hasPower(metal) || !this.hasMetalmind(metal, player) || (tappingLevel < 0 && ((metal == Metal.COPPER && player.totalExperience <= 0 && player.experienceLevel <= 0) || metal == Metal.BENDALLOY && player.getFoodData().getFoodLevel() <= 0))) {
+                                this.setTappingLevel(metal, 0);
+                                removeEffects(player, metal);
+                                sync = true;
+                            } else {
+                                if ((tappingLevel > 0 && charges <= 0) || (tappingLevel < 0 && this.areMetalmindsFull(metal, player))) {
+                                    this.setTappingLevel(metal, 0);
+                                    removeEffects(player, metal);
+                                    sync = true;
+                                } else if (charges <= 0) {
+                                    if (metal == Metal.GOLD) this.adjustGold(player, tappingLevel);
+                                    if (metal == Metal.BENDALLOY) this.adjustBendalloy(player, tappingLevel);
+                                    adjustMetalmindCharges(metal, tappingLevel, player);
+                                    sync = true;
+                                } else {
+                                    if(metal == Metal.NICROSIL){
+                                        adjustNicrosil(player, tappingLevel);
+                                        if(!wasTappingNicrosil){
+                                            sync = true;
+                                            wasTappingNicrosil = true;
+                                        }
+                                    }
+                                    else {
+                                        if (metal == Metal.GOLD) this.adjustGold(player, tappingLevel);
+                                        if (metal == Metal.BENDALLOY) this.adjustBendalloy(player, tappingLevel);
+                                        adjustMetalmindCharges(metal, tappingLevel, player);
+                                    }
+                                }
+                            }
                         }
+                        if (sync) {
+                            ModMessages.sync(this, player);
+                        }
+                    }
+                    else if(wasTappingNicrosil){
+                        Arrays.fill(this.feruchemical_powers_nicrosil, false);
+                        wasTappingNicrosil = false;
+                        ModMessages.sync(this, player);
                     }
                 }
             }
-            if (sync) {
-                ModMessages.sync(this, player);
+            else {
+                if (!this.hasPower(Metal.NICROSIL) || !this.hasMetalmind(Metal.NICROSIL, player) || this.areMetalmindsFull(Metal.NICROSIL, player)){
+                    this.setTappingLevel(Metal.NICROSIL, 0);
+                    ModMessages.sync(this, player);
+                }
+                else {
+                    this.stopTapping(player);
+                    this.setTappingLevel(Metal.NICROSIL, -1);
+                    adjustNicrosil(player, -1);
+                }
             }
         }
         else{
@@ -125,6 +167,45 @@ public class DefaultFeruchemistData implements IFeruchemyData {
                         }
                         slot.stack().getTag().putInt("cooldown", 1);
                     }
+                }
+            }
+        }
+    }
+
+    public void adjustNicrosil(ServerPlayer player, int tappingLevel){
+        List<SlotResult> curios = CuriosApi.getCuriosHelper().findCurios(player, "ring", "bracelet");
+        if(tappingLevel < 0) {
+            for (SlotResult slot : curios) {
+                if (slot.stack().getItem() instanceof MetalmindItem && ((MetalmindItem) slot.stack().getItem()).getMetal() == Metal.NICROSIL) {
+                    for(Metal metal : getPowers()){
+                        slot.stack().getOrCreateTag().putInt(metal.getName()+"_feruchemy", slot.stack().getTag().getInt(metal.getName()+"_feruchemy")-tappingLevel);
+                    }
+                    slot.stack().getTag().putInt("charges", slot.stack().getTag().getInt("charges")-tappingLevel);
+                    return;
+                }
+            }
+        }
+        else{
+            for (SlotResult slot : curios) {
+                boolean flag2 = false;
+                if(flag){
+                    flag2 = true;
+                    flag = false;
+                }
+                if (slot.stack().getItem() instanceof MetalmindItem && ((MetalmindItem) slot.stack().getItem()).getMetal() == Metal.NICROSIL) {
+                    for(Metal metal : Metal.values()){
+                        int metalCharge = slot.stack().getOrCreateTag().getInt(metal.getName()+"_feruchemy");
+                        if(metalCharge > 0 && !this.hasPowerDefault(metal)){
+                            this.addPowerNicrosil(metal);
+                            slot.stack().getTag().putInt(metal.getName()+"_feruchemy", metalCharge-tappingLevel);
+                            if(metalCharge == 1) flag = true;
+                        }
+                        else{
+                            this.revokePowerNicrosil(metal);
+                        }
+                    }
+                    slot.stack().getTag().putInt("charges", slot.stack().getTag().getInt("charges")-tappingLevel);
+                    return;
                 }
             }
         }
@@ -302,19 +383,30 @@ public class DefaultFeruchemistData implements IFeruchemyData {
 
     @Override
     public void load(CompoundTag nbt) {
-        CompoundTag abilities = (CompoundTag) nbt.get("abilities");
+        CompoundTag defaultMetals = (CompoundTag) nbt.get("defaultMetals");
+        CompoundTag nicrosilMetals = (CompoundTag) nbt.get("nicrosilMetals");
+        CompoundTag hemalurgyMetals = (CompoundTag) nbt.get("hemalurgyMetals");
         for (Metal mt : Metal.values()) {
-            if (abilities.getBoolean(mt.getName())) {
+            if (defaultMetals.getBoolean(mt.getName())) {
                 this.addPower(mt);
             } else {
                 this.revokePower(mt);
+            }
+            if (nicrosilMetals.getBoolean(mt.getName())) {
+                this.addPowerNicrosil(mt);
+            } else {
+                this.revokePowerNicrosil(mt);
+            }
+            if (hemalurgyMetals.getBoolean(mt.getName())) {
+                this.addPowerHemalurgy(mt);
+            } else {
+                this.revokePowerHemalurgy(mt);
             }
         }
 
         CompoundTag metal_tapping = (CompoundTag) nbt.get("metal_tapping");
         for (Metal mt : Metal.values()) {
             this.setTappingLevel(mt, metal_tapping.getInt(mt.getName()));
-
         }
     }
 
@@ -322,11 +414,17 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     public CompoundTag save() {
         CompoundTag data = new CompoundTag();
 
-        CompoundTag abilities = new CompoundTag();
+        CompoundTag defaultMetals = new CompoundTag();
+        CompoundTag nicrosilMetals = new CompoundTag();
+        CompoundTag hemalurgyMetals = new CompoundTag();
         for (Metal mt : Metal.values()) {
-            abilities.putBoolean(mt.getName(), this.hasPower(mt));
+            defaultMetals.putBoolean(mt.getName(), this.hasPowerDefault(mt));
+            nicrosilMetals.putBoolean(mt.getName(), this.hasPowerNicrosil(mt));
+            hemalurgyMetals.putBoolean(mt.getName(), this.hasPowerHemalurgy(mt));
         }
-        data.put("abilities", abilities);
+        data.put("defaultMetals", defaultMetals);
+        data.put("nicrosilMetals", nicrosilMetals);
+        data.put("hemalurgyMetals", hemalurgyMetals);
 
         CompoundTag metal_tapping = new CompoundTag();
         for (Metal mt : Metal.values()) {
@@ -339,6 +437,21 @@ public class DefaultFeruchemistData implements IFeruchemyData {
 
     @Override
     public boolean hasPower(Metal metal) {
+        return this.hasPowerDefault(metal) || this.hasPowerNicrosil(metal) || this.hasPowerHemalurgy(metal);
+    }
+
+    @Override
+    public boolean hasPowerNicrosil(Metal metal) {
+        return this.feruchemical_powers_nicrosil[metal.getIndex()];
+    }
+
+    @Override
+    public boolean hasPowerHemalurgy(Metal metal) {
+        return this.feruchemical_powers_hemalurgy[metal.getIndex()];
+    }
+
+    @Override
+    public boolean hasPowerDefault(Metal metal) {
         return this.feruchemical_powers[metal.getIndex()];
     }
 
@@ -379,8 +492,28 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     }
 
     @Override
+    public void addPowerNicrosil(Metal metal) {
+        this.feruchemical_powers_nicrosil[metal.getIndex()] = true;
+    }
+
+    @Override
+    public void addPowerHemalurgy(Metal metal) {
+        this.feruchemical_powers_hemalurgy[metal.getIndex()] = true;
+    }
+
+    @Override
     public void revokePower(Metal metal) {
         this.feruchemical_powers[metal.getIndex()] = false;
+    }
+
+    @Override
+    public void revokePowerNicrosil(Metal metal) {
+        this.feruchemical_powers_nicrosil[metal.getIndex()] = false;
+    }
+
+    @Override
+    public void revokePowerHemalurgy(Metal metal) {
+        this.feruchemical_powers_hemalurgy[metal.getIndex()] = false;
     }
 
     @Override
@@ -391,6 +524,17 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     @Override
     public void setTappingLevel(Metal metal, int tappingLevel) {
         this.tapping_metals[metal.getIndex()] = tappingLevel;
+        /*if(metal == Metal.NICROSIL && tappingLevel > 0){
+            this.wasTappingNicrosil = true;
+        }*/
+    }
+
+    @Override
+    public void stopTapping(ServerPlayer player) {
+        for(Metal metal: Metal.values()){
+            this.tapping_metals[metal.getIndex()] = 0;
+            removeEffects(player, metal);
+        }
     }
 
     @Override

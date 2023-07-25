@@ -2,6 +2,7 @@ package com.extra.cosmerecraft.client.gui;
 
 import com.extra.cosmerecraft.api.data.IFeruchemyData;
 import com.extra.cosmerecraft.api.enums.Metal;
+import com.extra.cosmerecraft.client.KeyBindings;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.network.ModMessages;
 import com.extra.cosmerecraft.network.UpdateTappingPacket;
@@ -40,104 +41,123 @@ public class FeruchemySelectScreen extends Screen {
     public void render(PoseStack matrixStack, int mx, int my, float partialTicks){
         super.render(matrixStack, mx, my ,partialTicks);
 
-        int x = this.width / 2;
-        int y = this.height / 2;
-        int maxRadius = 80;
+        this.mc.player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
 
-        double angle = mouseAngle(x, y, mx, my);
+            int x = this.width / 2;
+            int y = this.height / 2;
+            int maxRadius = 80;
 
-        int segments = METALS.length;
-        float step = (float) Math.PI / 180;
-        float degPer = (float) Math.PI * 2 / segments;
+            double angle = mouseAngle(x, y, mx, my);
 
-        this.slotSelected = -1;
+            int segments = METALS.length;
+            float step = (float) Math.PI / 180;
+            float degPer = (float) Math.PI * 2 / segments;
 
-        Tesselator tess = Tesselator.getInstance();
-        BufferBuilder buf = tess.getBuilder();
+            this.slotSelected = -1;
 
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            Tesselator tess = Tesselator.getInstance();
+            BufferBuilder buf = tess.getBuilder();
 
-        buf.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+            RenderSystem.disableCull();
+            RenderSystem.enableBlend();
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-        for (int seg = 0; seg < segments; seg++) {
-            Metal mt = Metal.getMetal(toMetalIndex(seg));
-            boolean mouseInSector = /*data.hasPower(mt) && */(degPer * seg < angle && angle < degPer * (seg + 1));
-            float radius = 80;//Math.max(0F, Math.min((this.timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
-            if (mouseInSector) {
-                this.slotSelected = seg;
-                radius *= 1.025f;
+            buf.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+
+            for (int seg = 0; seg < segments; seg++) {
+                Metal mt = Metal.getMetal(toMetalIndex(seg));
+                boolean mouseInSector = data.hasPower(mt) && (degPer * seg < angle && angle < degPer * (seg + 1));
+                float radius = 80;//Math.max(0F, Math.min((this.timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
+                if (mouseInSector) {
+                    this.slotSelected = seg;
+                    radius *= 1.025f;
+                }
+
+                int gs = 0x55;
+                if (seg % 2 == 0) {
+                    gs += 0x19;
+                }
+
+                gs = !data.hasPower(mt) ? 0 : gs;
+
+
+                int tappingLevel = data.tappingLevel(mt);
+                int r;
+                int b;
+                if(tappingLevel > 0) {
+                    r = gs+(tappingLevel*(0x55)/mt.getMaxTap());
+                    b = gs;
+                }
+                else if(tappingLevel<0){
+                    r = gs;
+                    b = gs-(tappingLevel*(0x55)/mt.getMinTap());
+                }
+                else{
+                    r = gs;
+                    b = gs;
+                }
+                r = Math.min(r, 0xff);
+                b = Math.min(b, 0xff);
+                int g = gs;
+                int a = 0x99;
+
+                if (seg == 0) {
+                    buf.vertex(x, y, 0).color(0x19, 0x19, 0x19, 0x15).endVertex();
+                }
+
+                for (float v = 0; v < degPer + step / 2; v += step) {
+                    float rad = v + seg * degPer;
+                    float xp = x + Mth.cos(rad) * radius;
+                    float yp = y + Mth.sin(rad) * radius;
+
+                    if (v == 0) {
+                        buf.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
+                    }
+                    buf.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
+                }
             }
+            tess.end();
 
-            int gs = 0x55;
-            if (seg % 2 == 0) {
-                gs += 0x19;
-            }
+            for (int seg = 0; seg < segments; seg++) {
+                Metal mt = Metal.getMetal(toMetalIndex(seg));
+                boolean mouseInSector = data.hasPower(mt) && (degPer * seg < angle && angle < degPer * (seg + 1));
+                float radius = maxRadius;//Math.max(0F, Math.min((this.timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
+                if (mouseInSector) {
+                    radius *= 1.025f;
+                }
 
-            //gs = (!data.hasPower(mt) || data.getAmount(mt) == 0) ? 0 : gs;
 
-            int r = gs;//data.isBurning(mt) ? 0xFF : gs;
-            int g = gs;
-            int b = gs;
-            int a = 0x99;
-
-            if (seg == 0) {
-                buf.vertex(x, y, 0).color(0x19, 0x19, 0x19, 0x15).endVertex();
-            }
-
-            for (float v = 0; v < degPer + step / 2; v += step) {
-                float rad = v + seg * degPer;
+                float rad = (seg + 0.5f) * degPer;
                 float xp = x + Mth.cos(rad) * radius;
                 float yp = y + Mth.sin(rad) * radius;
 
-                if (v == 0) {
-                    buf.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
+                float xsp = xp - 4;
+                float ysp = yp;
+                String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
+                int textwidth = this.mc.font.width(name);
+
+                if (xsp < x) {
+                    xsp -= textwidth - 8;
                 }
-                buf.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
-            }
-        }
-        tess.end();
+                if (ysp < y) {
+                    ysp -= 9;
+                }
 
-        for (int seg = 0; seg < segments; seg++) {
-            Metal mt = Metal.getMetal(toMetalIndex(seg));
-            boolean mouseInSector = /*data.hasPower(mt) && */(degPer * seg < angle && angle < degPer * (seg + 1));
-            float radius = maxRadius;//Math.max(0F, Math.min((this.timeIn + partialTicks - seg * 6F / segments) * 40F, maxRadius));
-            if (mouseInSector) {
-                radius *= 1.025f;
-            }
+                this.mc.font.drawShadow(matrixStack, name, xsp, ysp, 0xFFFFFF);
 
+                double mod = 0.8;
+                int xdp = (int) ((xp - x) * mod + x);
+                int ydp = (int) ((yp - y) * mod + y);
+                RenderSystem.setShader(GameRenderer::getPositionTexShader);
+                RenderSystem.setShaderTexture(0, METAL_ICONS[toMetalIndex(seg)]);
+                blit(matrixStack, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
-            float rad = (seg + 0.5f) * degPer;
-            float xp = x + Mth.cos(rad) * radius;
-            float yp = y + Mth.sin(rad) * radius;
-
-            float xsp = xp - 4;
-            float ysp = yp;
-            String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
-            int textwidth = this.mc.font.width(name);
-
-            if (xsp < x) {
-                xsp -= textwidth - 8;
-            }
-            if (ysp < y) {
-                ysp -= 9;
             }
 
-            this.mc.font.drawShadow(matrixStack, name, xsp, ysp, 0xFFFFFF);
-
-            double mod = 0.8;
-            int xdp = (int) ((xp - x) * mod + x);
-            int ydp = (int) ((yp - y) * mod + y);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
-            RenderSystem.setShaderTexture(0, METAL_ICONS[toMetalIndex(seg)]);
-            blit(matrixStack, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
-
-        }
-
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
-        RenderSystem.disableBlend();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+            RenderSystem.disableBlend();
+        });
     }
 
     private static double mouseAngle(int x, int y, int mx, int my) {
@@ -154,11 +174,20 @@ public class FeruchemySelectScreen extends Screen {
         return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
+    @Override
+    public boolean keyReleased(int keysym, int scancode, int modifiers) {
+        if (KeyBindings.FERUCHEMY_MENU_KEY.matches(keysym, scancode)) {
+            this.mc.setScreen(null);
+            this.mc.mouseHandler.grabMouse();
+            return true;
+        }
+        return super.keyReleased(keysym, scancode, modifiers);
+    }
+
 
     private void toggleSelected(int mouseButton) {
         if (this.slotSelected != -1) {
             Metal mt = Metal.getMetal(toMetalIndex(this.slotSelected));
-            System.out.println(mt.getName());
             this.mc.player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
                 changeTapping(mt, data, mouseButton);
                 this.mc.player.playSound(SoundEvents.UI_BUTTON_CLICK, 0.1F, 2.0F);
@@ -169,14 +198,10 @@ public class FeruchemySelectScreen extends Screen {
 
     public static void changeTapping(Metal metal, IFeruchemyData capability, int mouseButton) {
         int modificator = mouseButton == 0 ? 1 : -1;
-        if (!capability.hasPower(metal) || (capability.tappingLevel(metal) + modificator > 3 && modificator == 1) || (capability.tappingLevel(metal) + modificator < metal.getMinTap() && modificator == -1)) {
+        if (!capability.hasPower(metal) || (capability.tappingLevel(Metal.NICROSIL) < 0 && metal != Metal.NICROSIL) || (capability.tappingLevel(metal) + modificator > metal.getMaxTap() && modificator == 1) || (capability.tappingLevel(metal) + modificator < metal.getMinTap() && modificator == -1)) {
             return;
         }
         ModMessages.sendToServer(new UpdateTappingPacket(metal, capability.tappingLevel(metal), modificator));
-
-       /* if (capability.getAmount(metal) > 0) {
-            capability.setBurning(metal, !capability.isBurning(metal));
-        }*/
     }
 
 

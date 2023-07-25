@@ -55,17 +55,28 @@ public class MetalmindItem extends Item implements ICurioItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
         if(this.metal == Metal.COPPER){
-            components.add(Component.literal("Charges: " + stack.getOrCreateTag().getInt("charges")));
+            components.add(Component.translatable("tooltip.charges").append(": " + stack.getOrCreateTag().getInt("charges")));
         }
         else{
-            components.add(Component.literal("Charges: " + stack.getOrCreateTag().getInt("charges")/20));
+            components.add(Component.translatable("tooltip.charges").append(": " + stack.getOrCreateTag().getInt("charges")/20));
         }
         String key = stack.getOrCreateTag().getString("key");
         if(key.equals("null")){
-            components.add(Component.literal("Key: " + "Unkeyed"));
+            components.add(Component.translatable("tooltip.key_unkeyed"));
         }
         else if(!key.equals("")){
-            components.add(Component.literal("Key: " + key));
+            components.add(Component.translatable("tooltip.key").append(": "+ key));
+        }
+
+        for(Metal metal : Metal.values()){
+            int metalCharge = stack.getTag().getInt(metal.getName()+"_feruchemy");
+            if(metalCharge > 0){
+                components.add(Component.translatable("tooltip."+metal.getName()+".feruchemy").append(" "+metalCharge/20));
+            }
+            metalCharge = stack.getTag().getInt(metal.getName()+"_allomancy");
+            if(metalCharge > 0){
+                components.add(Component.translatable("tooltip."+metal.getName()+".allomancy").append(" "+metalCharge/20));
+            }
         }
 
         super.appendHoverText(stack, level, components, flag);

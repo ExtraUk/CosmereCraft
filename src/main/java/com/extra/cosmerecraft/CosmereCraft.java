@@ -1,6 +1,10 @@
 package com.extra.cosmerecraft;
 
+import com.extra.cosmerecraft.block.ModBlocks;
+import com.extra.cosmerecraft.block.entity.ModBlockEntities;
 import com.extra.cosmerecraft.client.KeyBindings;
+import com.extra.cosmerecraft.client.gui.AlloyingFurnaceScreen;
+import com.extra.cosmerecraft.client.gui.ModMenuTypes;
 import com.extra.cosmerecraft.command.CommandSetup;
 import com.extra.cosmerecraft.command.FeruchemyPowerType;
 import com.extra.cosmerecraft.command.PowerCommand;
@@ -11,9 +15,13 @@ import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
 import com.extra.cosmerecraft.loot.LootModifierRegistry;
 import com.extra.cosmerecraft.network.ModMessages;
+import com.extra.cosmerecraft.recipe.ModRecipes;
+import com.extra.cosmerecraft.world.feature.ModConfiguredFeatures;
+import com.extra.cosmerecraft.world.feature.ModPlacedFeatures;
 import com.google.common.graph.Network;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -55,6 +63,10 @@ public class CosmereCraft
         ModItems.register(modEventBus);
         ModEffects.register(modEventBus);
         LootModifierRegistry.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
+        ModRecipes.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::enqueueIMC);
         modEventBus.addListener(CosmereCraft::init);
@@ -83,6 +95,7 @@ public class CosmereCraft
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             MinecraftForge.EVENT_BUS.register(new ClientEvents());
+            MenuScreens.register(ModMenuTypes.ALLOYING_FURNACE_MENU.get(), AlloyingFurnaceScreen::new);
         }
     }
 

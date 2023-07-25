@@ -1,0 +1,21 @@
+{
+  "type": "cosmerecraft:alloying_furnace",
+  "ingredients": [
+    {
+      "item": "cosmerecraft:tin_ingot"
+    },
+    {
+      "item": "cosmerecraft:tin_ingot"
+    },
+    {
+      "item": "cosmerecraft:tin_ingot"
+    },
+    {
+      "item": "minecraft:copper_ingot"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:pewter_ingot",
+    "count": 4
+  }
+}

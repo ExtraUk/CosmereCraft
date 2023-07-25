@@ -1,0 +1,15 @@
+{
+  "type": "cosmerecraft:alloying_furnace",
+  "ingredients": [
+    {
+      "item": "cosmerecraft:silver_ingot"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:electrum_ingot",
+    "count": 2
+  }
+}

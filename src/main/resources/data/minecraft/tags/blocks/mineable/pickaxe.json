@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+    "cosmerecraft:tin_ore",
+    "cosmerecraft:deepslate_tin_ore",
+    "cosmerecraft:zinc_ore",
+    "cosmerecraft:deepslate_zinc_ore",
+    "cosmerecraft:bauxite_ore",
+    "cosmerecraft:deepslate_bauxite_ore",
+    "cosmerecraft:cadmium_ore",
+    "cosmerecraft:deepslate_cadmium_ore",
+    "cosmerecraft:chromium_ore",
+    "cosmerecraft:deepslate_chromium_ore",
+    "cosmerecraft:silver_ore",
+    "cosmerecraft:deepslate_silver_ore",
+    "cosmerecraft:bismuth_ore",
+    "cosmerecraft:deepslate_bismuth_ore",
+    "cosmerecraft:nickel_ore",
+    "cosmerecraft:deepslate_nickel_ore"
+  ]
+}

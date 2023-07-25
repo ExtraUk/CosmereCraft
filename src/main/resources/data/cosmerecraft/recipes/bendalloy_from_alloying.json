@@ -1,0 +1,21 @@
+{
+  "type": "cosmerecraft:alloying_furnace",
+  "ingredients": [
+    {
+      "item": "cosmerecraft:bismuth_ingot"
+    },
+    {
+      "item": "cosmerecraft:bismuth_ingot"
+    },
+    {
+      "item": "cosmerecraft:cadmium_ingot"
+    },
+    {
+      "item": "cosmerecraft:cadmium_ingot"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:bendalloy_ingot",
+    "count": 4
+  }
+}

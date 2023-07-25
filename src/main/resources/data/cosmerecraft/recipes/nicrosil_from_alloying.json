@@ -1,0 +1,21 @@
+{
+  "type": "cosmerecraft:alloying_furnace",
+  "ingredients": [
+    {
+      "item": "cosmerecraft:nickel_ingot"
+    },
+    {
+      "item": "cosmerecraft:nickel_ingot"
+    },
+    {
+      "item": "cosmerecraft:nickel_ingot"
+    },
+    {
+      "item": "cosmerecraft:chromium_ingot"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:nicrosil_ingot",
+    "count": 4
+  }
+}

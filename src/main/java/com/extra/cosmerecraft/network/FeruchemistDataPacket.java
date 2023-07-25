@@ -44,7 +44,6 @@ public class FeruchemistDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             Player player = Minecraft.getInstance().level.getPlayerByUUID(this.uuid);
-
             if (player != null && FeruchemistCapability.PLAYER_CAP_FERUCHEMY != null) {
                 player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> data.load(this.nbt));
             }
