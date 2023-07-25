@@ -1,6 +1,7 @@
 package com.extra.cosmerecraft.api.data;
 
 import com.extra.cosmerecraft.api.enums.Metal;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -119,4 +120,6 @@ public interface IFeruchemyData {
     void setBronzeSleepingTime(Player player, long dayTime);
 
     void setBronzeWakeUpCharges(Player player, long dayTime);
+
+    int getAllCharges(Metal metal, LocalPlayer player);
 }

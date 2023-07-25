@@ -135,15 +135,20 @@ public class FeruchemySelectScreen extends Screen {
                 float ysp = yp;
                 String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
                 int textwidth = this.mc.font.width(name);
-
                 if (xsp < x) {
                     xsp -= textwidth - 8;
                 }
                 if (ysp < y) {
                     ysp -= 9;
                 }
-
                 this.mc.font.drawShadow(matrixStack, name, xsp, ysp, 0xFFFFFF);
+                String charges = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.literal(String.valueOf(data.getAllCharges(mt, this.mc.player)/20)).getString();
+                textwidth = this.mc.font.width(charges);
+                if (xsp < x) {
+                    xsp -= textwidth - 8;
+                }
+                ysp -= 8;
+                this.mc.font.drawShadow(matrixStack, charges, xsp, ysp, 0xFFFFFF);
 
                 double mod = 0.8;
                 int xdp = (int) ((xp - x) * mod + x);

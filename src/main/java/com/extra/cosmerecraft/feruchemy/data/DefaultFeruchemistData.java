@@ -6,6 +6,7 @@ import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.item.MetalmindItem;
 import com.extra.cosmerecraft.item.ModItems;
 import com.extra.cosmerecraft.network.ModMessages;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -236,6 +237,22 @@ public class DefaultFeruchemistData implements IFeruchemyData {
                 }
             }
         }
+    }
+
+    @Override
+    public int getAllCharges(Metal metal, LocalPlayer player) {
+        int ret = 0;
+        List<SlotResult> curios = CuriosApi.getCuriosHelper().findCurios(player, "ring", "bracelet");
+        for(SlotResult slot: curios){
+            if(slot.stack().getItem() instanceof MetalmindItem){
+                if(((MetalmindItem) slot.stack().getItem()).getMetal() == metal) {
+                    if(slot.stack().getOrCreateTag().getString("key").equals(player.getName().getString()) || slot.stack().getOrCreateTag().getString("key").equals("null")) {
+                        ret += slot.stack().getTag().getInt("charges");
+                    }
+                }
+            }
+        }
+        return ret;
     }
 
     @Override
