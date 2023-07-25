@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:electrum_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:electrum_bracelet",
+    "count": 1
+  }
+}

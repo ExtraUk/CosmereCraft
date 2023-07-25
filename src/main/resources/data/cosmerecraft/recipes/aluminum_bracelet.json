@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:aluminum_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:aluminum_bracelet",
+    "count": 1
+  }
+}

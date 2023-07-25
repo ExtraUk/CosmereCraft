@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " c ",
+    "c c",
+    " c "
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:nicrosil_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:nicrosil_ring",
+    "count": 1
+  }
+}

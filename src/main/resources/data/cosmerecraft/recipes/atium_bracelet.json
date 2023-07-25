@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:atium_bead"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:atium_bracelet",
+    "count": 1
+  }
+}

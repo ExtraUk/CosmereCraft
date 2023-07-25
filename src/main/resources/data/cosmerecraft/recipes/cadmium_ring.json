@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " c ",
+    "c c",
+    " c "
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:cadmium_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:cadmium_ring",
+    "count": 1
+  }
+}

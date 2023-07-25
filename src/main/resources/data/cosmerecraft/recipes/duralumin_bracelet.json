@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:duralumin_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:duralumin_bracelet",
+    "count": 1
+  }
+}

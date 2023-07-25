@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:bendalloy_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:bendalloy_bracelet",
+    "count": 1
+  }
+}

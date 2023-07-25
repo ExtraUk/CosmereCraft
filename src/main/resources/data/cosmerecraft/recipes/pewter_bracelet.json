@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:pewter_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:pewter_bracelet",
+    "count": 1
+  }
+}

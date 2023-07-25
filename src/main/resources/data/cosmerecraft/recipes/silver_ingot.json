@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "cosmerecraft:raw_silver"
+  },
+  "result": "cosmerecraft:silver_ingot",
+  "experience": 0.7,
+  "cookingtime": 200
+}

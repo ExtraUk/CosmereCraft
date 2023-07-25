@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ccc",
+    "c c",
+    "ccc"
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:chromium_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:chromium_bracelet",
+    "count": 1
+  }
+}

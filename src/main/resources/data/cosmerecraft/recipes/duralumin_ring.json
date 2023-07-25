@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " c ",
+    "c c",
+    " c "
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:duralumin_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:duralumin_ring",
+    "count": 1
+  }
+}

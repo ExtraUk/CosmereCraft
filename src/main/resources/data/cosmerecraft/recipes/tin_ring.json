@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " c ",
+    "c c",
+    " c "
+  ],
+  "key": {
+    "c": {
+      "item": "cosmerecraft:tin_ingot"
+    }
+  },
+  "result": {
+    "item": "cosmerecraft:tin_ring",
+    "count": 1
+  }
+}
