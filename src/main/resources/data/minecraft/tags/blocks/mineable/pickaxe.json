@@ -16,6 +16,12 @@
     "cosmerecraft:bismuth_ore",
     "cosmerecraft:deepslate_bismuth_ore",
     "cosmerecraft:nickel_ore",
-    "cosmerecraft:deepslate_nickel_ore"
+    "cosmerecraft:deepslate_nickel_ore",
+    "cosmerecraft:alloying_furnace",
+    "cosmerecraft:atium_geode_block",
+    "cosmerecraft:atium_cluster",
+    "cosmerecraft:small_atium_bud",
+    "cosmerecraft:medium_atium_bud",
+    "cosmerecraft:large_atium_bud"
   ]
 }

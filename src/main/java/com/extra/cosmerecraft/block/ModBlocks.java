@@ -9,10 +9,7 @@ import net.minecraft.data.worldgen.features.OreFeatures;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.AmethystBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.DropExperienceBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -23,7 +20,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -32,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
+
+import static net.minecraft.world.level.block.Blocks.AMETHYST_CLUSTER;
 
 public class ModBlocks {
 
@@ -77,8 +78,17 @@ public class ModBlocks {
     }
     public static final RegistryObject<Block> ATIUM_GEODE_BLOCK = BLOCKS.register("atium_geode_block", () -> new AmethystBlock(BlockBehaviour.Properties.of(Material.AMETHYST, MaterialColor.COLOR_GREEN).strength(1.5F).sound(SoundType.AMETHYST).requiresCorrectToolForDrops()));
     public static final RegistryObject<Block> ALLOYING_FURNACE_BLOCK = BLOCKS.register("alloying_furnace", () -> new AlloyingFurnaceBlock(BlockBehaviour.Properties.of(Material.STONE).requiresCorrectToolForDrops().strength(3.5F).lightLevel(litBlockEmission(13))));
+    public static final RegistryObject<Block> BUDDING_ATIUM_BLOCK = BLOCKS.register("budding_atium_block", () -> new BuddingAtiumBlock(BlockBehaviour.Properties.of(Material.AMETHYST).randomTicks().strength(1.5F).sound(SoundType.AMETHYST).requiresCorrectToolForDrops()));
+    public static final RegistryObject<Block> ATIUM_CLUSTER = BLOCKS.register("atium_cluster", () -> new AmethystClusterBlock(7, 3, BlockBehaviour.Properties.of(Material.AMETHYST).noOcclusion().randomTicks().sound(SoundType.AMETHYST_CLUSTER).strength(1.5F).lightLevel((p_152632_) -> {return 7;})));
+    public static final RegistryObject<Block> SMALL_ATIUM_BUD = BLOCKS.register("small_atium_bud", () -> new AmethystClusterBlock(3, 4, BlockBehaviour.Properties.copy(AMETHYST_CLUSTER).sound(SoundType.SMALL_AMETHYST_BUD).lightLevel((cuack) -> {return 1;})));
+    public static final RegistryObject<Block> MEDIUM_ATIUM_BUD = BLOCKS.register("medium_atium_bud", () -> new AmethystClusterBlock(4, 3, BlockBehaviour.Properties.copy(AMETHYST_CLUSTER).sound(SoundType.MEDIUM_AMETHYST_BUD).lightLevel((cuack) -> {return 2;})));
+    public static final RegistryObject<Block> LARGE_ATIUM_BUD = BLOCKS.register("large_atium_bud", () -> new AmethystClusterBlock(5, 3, BlockBehaviour.Properties.copy(AMETHYST_CLUSTER).sound(SoundType.LARGE_AMETHYST_BUD).lightLevel((cuack) -> {return 3;})));
+
+
     public static final RegistryObject<Item> ATIUM_GEODE_BLOCK_ITEM = ModItems.ITEMS.register("atium_geode_block", () -> new BlockItem(ATIUM_GEODE_BLOCK.get(), new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+    public static final RegistryObject<Item> BUDDING_ATIUM_BLOCK_ITEM = ModItems.ITEMS.register("budding_atium_block", () -> new BlockItem(BUDDING_ATIUM_BLOCK.get(), new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
     public static final RegistryObject<Item> ALLOYING_FURNACE_BLOCK_ITEM = ModItems.ITEMS.register("alloying_furnace", () -> new BlockItem(ALLOYING_FURNACE_BLOCK.get(), new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+
 
     private static ToIntFunction<BlockState> litBlockEmission(int pLightValue) {
         return (p_50763_) -> {

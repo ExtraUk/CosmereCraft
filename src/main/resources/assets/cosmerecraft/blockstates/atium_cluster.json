@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "cosmerecraft:block/atium_cluster",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "cosmerecraft:block/atium_cluster",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "cosmerecraft:block/atium_cluster",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "cosmerecraft:block/atium_cluster",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "cosmerecraft:block/atium_cluster"
+    },
+    "facing=west": {
+      "model": "cosmerecraft:block/atium_cluster",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

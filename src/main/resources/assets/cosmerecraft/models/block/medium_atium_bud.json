@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "cosmerecraft:block/medium_atium_bud"
+  },
+  "render_type": "cutout"
+}
