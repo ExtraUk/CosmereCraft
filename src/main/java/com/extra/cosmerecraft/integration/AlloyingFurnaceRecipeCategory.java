@@ -27,7 +27,7 @@ public class AlloyingFurnaceRecipeCategory implements IRecipeCategory<AlloyingFu
     private final IDrawable icon;
 
     public AlloyingFurnaceRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 85);
+        this.background = helper.createDrawable(TEXTURE, 0, 0, 176, 83);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(ModBlocks.ALLOYING_FURNACE_BLOCK.get()));
     }
 

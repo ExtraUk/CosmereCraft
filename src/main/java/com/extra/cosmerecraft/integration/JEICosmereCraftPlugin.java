@@ -1,10 +1,12 @@
 package com.extra.cosmerecraft.integration;
 
 import com.extra.cosmerecraft.CosmereCraft;
+import com.extra.cosmerecraft.block.ModBlocks;
 import com.extra.cosmerecraft.recipe.AlloyingFurnaceRecipe;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
@@ -27,6 +29,11 @@ public class JEICosmereCraftPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new AlloyingFurnaceRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
+    }
+
+    @Override
+    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        registration.addRecipeCatalyst(ModBlocks.ALLOYING_FURNACE_BLOCK_ITEM.get().getDefaultInstance(), ALLOYING_TYPE);
     }
 
     @Override
