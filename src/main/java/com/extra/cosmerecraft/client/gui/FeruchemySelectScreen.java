@@ -133,7 +133,7 @@ public class FeruchemySelectScreen extends Screen {
 
                 float xsp = xp - 4;
                 float ysp = yp;
-                String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable(METAL_LOCAL[toMetalIndex(seg)]).getString();
+                String name = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.translatable("cosmerecraft."+METAL_LOCAL[toMetalIndex(seg)]).getString();
                 int textwidth = this.mc.font.width(name);
                 if (xsp < x) {
                     xsp -= textwidth - 8;
