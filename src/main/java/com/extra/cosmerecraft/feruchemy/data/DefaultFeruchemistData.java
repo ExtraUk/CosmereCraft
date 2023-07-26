@@ -426,6 +426,8 @@ public class DefaultFeruchemistData implements IFeruchemyData {
         for (Metal mt : Metal.values()) {
             this.setTappingLevel(mt, metal_tapping.getInt(mt.getName()));
         }
+
+        this.wasInvested = nbt.getBoolean("wasInvested");
     }
 
     @Override
@@ -449,7 +451,7 @@ public class DefaultFeruchemistData implements IFeruchemyData {
             metal_tapping.putInt(mt.getName(), this.tappingLevel(mt));
         }
         data.put("metal_tapping", metal_tapping);
-
+        data.putBoolean("wasInvested", this.wasEverInvested());
         return data;
     }
 

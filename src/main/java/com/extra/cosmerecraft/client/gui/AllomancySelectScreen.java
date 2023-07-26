@@ -1,12 +1,14 @@
 package com.extra.cosmerecraft.client.gui;
 
+import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
+import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.data.IFeruchemyData;
 import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.client.KeyBindings;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.network.ModMessages;
+import com.extra.cosmerecraft.network.UpdateBurnPacket;
 import com.extra.cosmerecraft.network.UpdateTappingPacket;
-import com.google.common.graph.Network;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.ChatFormatting;
@@ -21,18 +23,18 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
 
-public class FeruchemySelectScreen extends Screen {
+public class AllomancySelectScreen extends Screen {
 
     private static final String[] METALS = Arrays.stream(Metal.values()).map(Metal::getName).toArray(String[]::new);
     private static final String[] METAL_NAMES = Arrays.stream(Metal.values()).map(Metal::getName).toArray(String[]::new);
     private static final String[] METAL_LOCAL = Arrays.stream(METAL_NAMES).map(s -> "metals.cosmerecraft." + s).toArray(String[]::new);
-    private static final String GUI_METAL = "cosmerecraft:textures/gui/metals/%s_feruchemy.png";
+    private static final String GUI_METAL = "cosmerecraft:textures/gui/metals/%s_allomancy.png";
     private static final ResourceLocation[] METAL_ICONS = Arrays.stream(METAL_NAMES).map(s -> new ResourceLocation(String.format(GUI_METAL, s))).toArray(ResourceLocation[]::new);
     final Minecraft mc;
     int slotSelected = -1;
 
-    public FeruchemySelectScreen() {
-        super(Component.translatable("feruchemy_gui"));
+    public AllomancySelectScreen() {
+        super(Component.translatable("allomancy_gui"));
         this.mc = Minecraft.getInstance();
     }
 
@@ -41,8 +43,7 @@ public class FeruchemySelectScreen extends Screen {
     public void render(PoseStack matrixStack, int mx, int my, float partialTicks){
         super.render(matrixStack, mx, my ,partialTicks);
 
-        this.mc.player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
-
+        this.mc.player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
             int x = this.width / 2;
             int y = this.height / 2;
             int maxRadius = 80;
@@ -81,23 +82,16 @@ public class FeruchemySelectScreen extends Screen {
                 gs = !data.hasPower(mt) ? 0 : gs;
 
 
-                int tappingLevel = data.tappingLevel(mt);
+                boolean burn = data.isBurning(mt);
                 int r;
                 int b;
-                if(tappingLevel > 0) {
-                    r = gs+(tappingLevel*(0x55)/mt.getMaxTap());
-                    b = gs;
-                }
-                else if(tappingLevel<0){
-                    r = gs;
-                    b = gs-(tappingLevel*(0x55)/mt.getMinTap());
+                if(burn) {
+                    r = gs + 0x55;
                 }
                 else{
                     r = gs;
-                    b = gs;
                 }
-                r = Math.min(r, 0xff);
-                b = Math.min(b, 0xff);
+                b = gs;
                 int g = gs;
                 int a = 0x99;
 
@@ -142,8 +136,7 @@ public class FeruchemySelectScreen extends Screen {
                     ysp -= 9;
                 }
                 this.mc.font.drawShadow(matrixStack, name, xsp, ysp, 0xFFFFFF);
-                int div = mt == Metal.COPPER ? 1 : 20;
-                String charges = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.literal(String.valueOf(data.getAllCharges(mt, this.mc.player)/div)).getString();
+                String charges = (mouseInSector ? ChatFormatting.UNDERLINE : ChatFormatting.RESET) + Component.literal(String.valueOf(data.getMetalReserves(mt)/20)).getString();
                 textwidth = this.mc.font.width(charges);
                 if (xsp < x) {
                     xsp -= textwidth - 8;
@@ -176,13 +169,13 @@ public class FeruchemySelectScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        toggleSelected(mouseButton);
+        toggleSelected();
         return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public boolean keyReleased(int keysym, int scancode, int modifiers) {
-        if (KeyBindings.FERUCHEMY_MENU_KEY.matches(keysym, scancode)) {
+        if (KeyBindings.ALLOMANCY_MENU_KEY.matches(keysym, scancode)) {
             this.mc.setScreen(null);
             this.mc.mouseHandler.grabMouse();
             return true;
@@ -191,23 +184,22 @@ public class FeruchemySelectScreen extends Screen {
     }
 
 
-    private void toggleSelected(int mouseButton) {
+    private void toggleSelected() {
         if (this.slotSelected != -1) {
             Metal mt = Metal.getMetal(toMetalIndex(this.slotSelected));
-            this.mc.player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
-                changeTapping(mt, data, mouseButton);
+            this.mc.player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+                changeBurn(mt, data);
                 this.mc.player.playSound(SoundEvents.UI_BUTTON_CLICK, 0.1F, 2.0F);
             });
         }
     }
 
 
-    public static void changeTapping(Metal metal, IFeruchemyData capability, int mouseButton) {
-        int modificator = mouseButton == 0 ? 1 : -1;
-        if (!capability.hasPower(metal) || (capability.tappingLevel(Metal.NICROSIL) < 0 && metal != Metal.NICROSIL) || (capability.tappingLevel(metal) + modificator > metal.getMaxTap() && modificator == 1) || (capability.tappingLevel(metal) + modificator < metal.getMinTap() && modificator == -1)) {
+    public static void changeBurn(Metal metal, IAllomancyData capability) {
+        if (!capability.hasPower(metal)) {
             return;
         }
-        ModMessages.sendToServer(new UpdateTappingPacket(metal, capability.tappingLevel(metal), modificator));
+        ModMessages.sendToServer(new UpdateBurnPacket(metal, !capability.isBurning(metal)));
     }
 
 

@@ -1,6 +1,8 @@
 package com.extra.cosmerecraft.event;
 
 import com.extra.cosmerecraft.CosmereCraft;
+import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
+import com.extra.cosmerecraft.allomancy.data.AllomancerDataProvider;
 import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
@@ -19,6 +21,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -52,8 +55,10 @@ public class CommonEventHandler {
     @SubscribeEvent
     public static void onAttachCapability(final AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player p) {
-            FeruchemistDataProvider provider = new FeruchemistDataProvider();
-            event.addCapability(FeruchemistCapability.IDENTIFIER, provider);
+            FeruchemistDataProvider fProvider = new FeruchemistDataProvider();
+            AllomancerDataProvider aProvider = new AllomancerDataProvider();
+            event.addCapability(FeruchemistCapability.IDENTIFIER, fProvider);
+            event.addCapability(AllomancerCapability.IDENTIFIER, aProvider);
         }
     }
 
@@ -163,6 +168,14 @@ public class CommonEventHandler {
                     }
                 });
             }
+            else if(event.getTarget() instanceof AbstractHorse){
+                event.getEntity().getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
+                    if (data.tappingLevel(Metal.DURALUMIN) > 2) {
+                        ((AbstractHorse) event.getTarget()).setTamed(true);
+                        ((AbstractHorse) event.getTarget()).setOwnerUUID(event.getEntity().getUUID());
+                    }
+                });
+            }
         }
     }
 
@@ -215,8 +228,22 @@ public class CommonEventHandler {
             player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
                 if (!data.wasEverInvested()) {
                     Random rand = new Random();
+                    data.investFirstTime();
                     if(rand.nextInt(16) == 0){
                         data.setFeruchemist();
+                    }
+                    else{
+                        data.addPower(Metal.getMetal(rand.nextInt(Metal.values().length)));
+                    }
+                }
+            });
+
+            player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+                if (!data.wasEverInvested()) {
+                    Random rand = new Random();
+                    data.investFirstTime();
+                    if(rand.nextInt(16) == 0){
+                        data.setMistborn();
                     }
                     else{
                         data.addPower(Metal.getMetal(rand.nextInt(Metal.values().length)));
@@ -233,10 +260,17 @@ public class CommonEventHandler {
     @SubscribeEvent
     public static void onPlayerClone(final PlayerEvent.Clone event) {
         if (!event.getEntity().level.isClientSide() && event.getEntity() instanceof ServerPlayer player) {
-
-
             event.getOriginal().reviveCaps();
             player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> event.getOriginal().getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(oldData -> {
+                if (!oldData.isUninvested()) { // make sure the new player has the same power status
+                    for (Metal mt : Metal.values()) {
+                        if (oldData.hasPower(mt)) {
+                            data.addPower(mt);
+                        }
+                    }
+                }
+            }));
+            player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> event.getOriginal().getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(oldData -> {
                 if (!oldData.isUninvested()) { // make sure the new player has the same power status
                     for (Metal mt : Metal.values()) {
                         if (oldData.hasPower(mt)) {
@@ -274,6 +308,11 @@ public class CommonEventHandler {
     }
 
     private static void playerPowerTick(Player curPlayer, Level level) {
+        curPlayer.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+            if (curPlayer instanceof ServerPlayer player) {
+                data.tickBurn(player);
+            }
+        });
         curPlayer.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
             if (curPlayer instanceof ServerPlayer player) {
                 data.tickTapStore(player);

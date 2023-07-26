@@ -133,5 +133,9 @@
   "commands.cosmerecraft.getpowers": "Powers Present on ",
   "commands.cosmerecraft.addpower": "Power Added Succesfully",
   "commands.cosmerecraft.removepower": "Power Removed Succesfully",
-  "commands.cosmerecraft.all": "All"
+  "commands.cosmerecraft.all": "All",
+
+  "key.categories.cosmerecraft": "CosmereCraft",
+  "key.allomancy_menu": "Allomancy Menu",
+  "key.feruchemy_menu": "Feruchemy Menu"
 }

@@ -2,38 +2,40 @@ package com.extra.cosmerecraft.api.enums;
 
 public enum Metal {
 
-    IRON(true, false),
-    STEEL(false, true),
-    TIN(-1, 1, false, false),
-    PEWTER(false, true),
-    ZINC(false, false),
-    BRASS(false, true),
-    COPPER(true, false),
-    BRONZE(-1, 3, false, true),
-    ALUMINUM(-1, 3, false, false),
-    DURALUMIN(false, true),
-    CHROMIUM(false, false),
-    NICROSIL(-1, 1,false,true),
-    GOLD(true, false),
-    ELECTRUM(false, true),
-    CADMIUM(false, false),
-    BENDALLOY(false, true),
-    ATIUM(false, false);
+    IRON(true, false, 8),
+    STEEL(false, true, 8),
+    TIN(-1, 1, false, false, 1),
+    PEWTER(false, true, 4),
+    ZINC(false, false, 4),
+    BRASS(false, true, 4),
+    COPPER(true, false, 2),
+    BRONZE(-1, 3, false, true, 4),
+    ALUMINUM(-1, 3, false, false, 0),
+    DURALUMIN(false, true, 0),
+    CHROMIUM(false, false, 0),
+    NICROSIL(-1, 1,false,true, 0),
+    GOLD(true, false, 8),
+    ELECTRUM(false, true, 8),
+    CADMIUM(false, false, 20),
+    BENDALLOY(false, true, 80),
+    ATIUM(false, false, 20);
 
     private int minTap;
     private int maxTap;
     private boolean isVanilla;
     private boolean isAlloy;
+    private int alloDrain;
 
-    Metal(boolean isVanilla, boolean isAlloy){
-        this(-2,3,isVanilla, isAlloy);
+    Metal(boolean isVanilla, boolean isAlloy, int alloDrain){
+        this(-2,3,isVanilla, isAlloy, alloDrain);
     }
 
-    Metal(int minTap, int maxTap, boolean isVanilla, boolean isAlloy){
+    Metal(int minTap, int maxTap, boolean isVanilla, boolean isAlloy, int alloDrain){
         this.maxTap = maxTap;
         this.minTap = minTap;
         this.isVanilla = isVanilla;
         this.isAlloy = isAlloy;
+        this.alloDrain = alloDrain;
     }
 
     public String getName() {
@@ -61,6 +63,8 @@ public enum Metal {
     public int getMaxTap(){
         return this.maxTap;
     }
+
+    public int getAllomanticDrain() { return this.alloDrain;}
 
     public boolean isVanilla(){return this.isVanilla;}
 

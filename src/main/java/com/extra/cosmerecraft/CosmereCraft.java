@@ -1,5 +1,6 @@
 package com.extra.cosmerecraft;
 
+import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
 import com.extra.cosmerecraft.block.ModBlocks;
 import com.extra.cosmerecraft.block.entity.ModBlockEntities;
 import com.extra.cosmerecraft.client.KeyBindings;
@@ -75,6 +76,7 @@ public class CosmereCraft
         modEventBus.addListener(this::enqueueIMC);
         modEventBus.addListener(CosmereCraft::init);
         modEventBus.addListener(FeruchemistCapability::registerCapability);
+        modEventBus.addListener(AllomancerCapability::registerCapability);
 
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.addListener(CommandSetup::registerCommands);

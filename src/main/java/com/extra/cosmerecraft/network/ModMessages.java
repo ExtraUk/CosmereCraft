@@ -1,6 +1,8 @@
 package com.extra.cosmerecraft.network;
 
 import com.extra.cosmerecraft.CosmereCraft;
+import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
+import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.data.IFeruchemyData;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +24,8 @@ public class ModMessages {
     public static void registerPackets() {
         INSTANCE.registerMessage(id(), FeruchemistDataPacket.class, FeruchemistDataPacket::encode, FeruchemistDataPacket::decode, FeruchemistDataPacket::handle);
         INSTANCE.registerMessage(id(), UpdateTappingPacket.class, UpdateTappingPacket::encode, UpdateTappingPacket::decode, UpdateTappingPacket::handle);
+        INSTANCE.registerMessage(id(), AllomancerDataPacket.class, AllomancerDataPacket::encode, AllomancerDataPacket::decode, AllomancerDataPacket::handle);
+        INSTANCE.registerMessage(id(), UpdateBurnPacket.class, UpdateBurnPacket::encode, UpdateBurnPacket::decode, UpdateBurnPacket::handle);
     }
 
     public static <MSG> void sendToServer(MSG message){
@@ -36,8 +40,13 @@ public class ModMessages {
         sync(new FeruchemistDataPacket(cap, player), player);
     }
 
+    public static void sync(IAllomancyData cap, ServerPlayer player){
+        sync(new AllomancerDataPacket(cap, player), player);
+    }
+
     public static void sync(ServerPlayer player) {
         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> sync(data, player));
+        player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> sync(data, player));
     }
 
     public static void sync(Object msg, ServerPlayer player) {
