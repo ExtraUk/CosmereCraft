@@ -2,10 +2,10 @@ package com.extra.cosmerecraft.api.enums;
 
 public enum Metal {
 
-    IRON(true, false, 8),
-    STEEL(false, true, 8),
-    TIN(-1, 1, false, false, 1),
-    PEWTER(false, true, 4),
+    IRON(true, false, 2),
+    STEEL(false, true, 2),
+    TIN(false, false, 1),
+    PEWTER(false, true, 5),
     ZINC(false, false, 4),
     BRASS(false, true, 4),
     COPPER(true, false, 2),
@@ -27,7 +27,7 @@ public enum Metal {
     private int alloDrain;
 
     Metal(boolean isVanilla, boolean isAlloy, int alloDrain){
-        this(-2,3,isVanilla, isAlloy, alloDrain);
+        this(-2,6,isVanilla, isAlloy, alloDrain);
     }
 
     Metal(int minTap, int maxTap, boolean isVanilla, boolean isAlloy, int alloDrain){

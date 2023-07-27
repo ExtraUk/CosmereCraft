@@ -356,14 +356,9 @@ public class DefaultFeruchemistData implements IFeruchemyData {
     }
 
     public static void removeEffects(ServerPlayer player, Metal metal){
-        if(metal.getName().equals("tin")){
-            player.removeEffect(MobEffects.BLINDNESS);
-            player.removeEffect(MobEffects.NIGHT_VISION);
-        }
-        else if(metal.getName().equals("pewter")){
-            player.removeEffect(MobEffects.DAMAGE_BOOST);
+        if(metal.getName().equals("pewter")){
+            player.removeEffect(ModEffects.FERU_PEWTER.get());
             player.removeEffect(MobEffects.WEAKNESS);
-            player.removeEffect(MobEffects.DIG_SLOWDOWN);
         }
         else if(metal.getName().equals("iron")){
             player.removeEffect(MobEffects.SLOW_FALLING);

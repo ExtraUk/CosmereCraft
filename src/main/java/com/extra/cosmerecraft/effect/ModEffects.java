@@ -16,6 +16,8 @@ public class ModEffects {
     public static final RegistryObject<MobEffect> MANIC = MOB_EFFECTS.register("manic_effect", () -> new ManicEffect(MobEffectCategory.BENEFICIAL, 0xf0be41));
     public static final RegistryObject<MobEffect> YOUNG = MOB_EFFECTS.register("young_effect", () -> new YoungEffect(MobEffectCategory.BENEFICIAL, 0xe1f28a));
     public static final RegistryObject<MobEffect> OLD = MOB_EFFECTS.register("old_effect", () -> new OldEffect(MobEffectCategory.HARMFUL, 0x511a99));
+    public static final RegistryObject<MobEffect> ALLO_PEWTER = MOB_EFFECTS.register("allomancy_pewter_effect", () -> new AllomancyPewterEffect(MobEffectCategory.BENEFICIAL, 0xA9A29B));
+    public static final RegistryObject<MobEffect> FERU_PEWTER = MOB_EFFECTS.register("feruchemy_pewter_effect", () -> new FeruchemyPewterEffect(MobEffectCategory.BENEFICIAL, 0x7F776F));
 
     public static void register(IEventBus eventBus){
         MOB_EFFECTS.register(eventBus);

@@ -2,15 +2,12 @@ package com.extra.cosmerecraft.network;
 
 import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
 import com.extra.cosmerecraft.api.enums.Metal;
-import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-import static com.extra.cosmerecraft.feruchemy.data.DefaultFeruchemistData.removeEffects;
 
 public class UpdateBurnPacket {
     private final Metal mt;
@@ -42,6 +39,7 @@ public class UpdateBurnPacket {
                 else {
                     data.setBurning(this.mt, false);
                 }
+                data.removeEffects(player, this.mt);
                 ModMessages.sync(data, player);
             });
 

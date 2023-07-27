@@ -5,6 +5,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 public interface IAllomancyData {
     /**
@@ -112,7 +113,7 @@ public interface IAllomancyData {
 
     void investFirstTime();
 
-    void wipeReserves();
+    void wipeReserves(ServerPlayer player);
 
     public void setMetalReserves(Metal metal, int value);
 
@@ -120,4 +121,9 @@ public interface IAllomancyData {
 
     CompoundTag save();
 
+    void removeEffects(ServerPlayer player, Metal mt);
+
+    Vec3 getDeathLoc();
+
+    void setDeathLoc(int x, int y, int z);
 }

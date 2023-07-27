@@ -18,8 +18,12 @@ public class HeavyEffect extends MobEffect {
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier){
         if(entity.isInFluidType()){
-            entity.setDeltaMovement(0,-(amplifier+1),0);
+            entity.setDeltaMovement(entity.getDeltaMovement().subtract(0,(amplifier+1)/50.0,0));
         }
     }
 
+    @Override
+    public boolean isDurationEffectTick(int pDuration, int pAmplifier) {
+        return true;
+    }
 }

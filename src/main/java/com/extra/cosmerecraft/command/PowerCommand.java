@@ -1,5 +1,7 @@
 package com.extra.cosmerecraft.command;
 
+import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
+import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.data.IFeruchemyData;
 import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
@@ -51,24 +53,44 @@ public class PowerCommand {
                 .then(Commands.argument("targets", EntityArgument.players()).executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::getPowers))));
 
         root.then(Commands
-                .literal("add")
+                .literal("add_feruchemy")
                 .requires(permissions(2))
                 .then(Commands
                         .argument("type", FeruchemyPowerType.INSTANCE)
-                        .executes(ctx -> handleMultiPlayer(ctx, sender(ctx), PowerCommand::addPower))
+                        .executes(ctx -> handleMultiPlayer(ctx, sender(ctx), PowerCommand::addPowerFeruchemy))
                         .then(Commands
                                 .argument("targets", EntityArgument.players())
-                                .executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::addPower)))));
+                                .executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::addPowerFeruchemy)))));
 
         root.then(Commands
-                .literal("remove")
+                .literal("add_allomancy")
+                .requires(permissions(2))
+                .then(Commands
+                        .argument("type", AllomancyPowerType.INSTANCE)
+                        .executes(ctx -> handleMultiPlayer(ctx, sender(ctx), PowerCommand::addPowerAllomancy))
+                        .then(Commands
+                                .argument("targets", EntityArgument.players())
+                                .executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::addPowerAllomancy)))));
+
+        root.then(Commands
+                .literal("remove_feruchemy")
                 .requires(permissions(2))
                 .then(Commands
                         .argument("type", FeruchemyPowerType.INSTANCE)
-                        .executes(ctx -> handleMultiPlayer(ctx, sender(ctx), PowerCommand::removePower))
+                        .executes(ctx -> handleMultiPlayer(ctx, sender(ctx), PowerCommand::removePowerFeruchemy))
                         .then(Commands
                                 .argument("targets", EntityArgument.players())
-                                .executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::removePower)))));
+                                .executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::removePowerFeruchemy)))));
+
+        root.then(Commands
+                .literal("remove_allomancy")
+                .requires(permissions(2))
+                .then(Commands
+                        .argument("type", AllomancyPowerType.INSTANCE)
+                        .executes(ctx -> handleMultiPlayer(ctx, sender(ctx), PowerCommand::removePowerAllomancy))
+                        .then(Commands
+                                .argument("targets", EntityArgument.players())
+                                .executes(ctx -> handleMultiPlayer(ctx, target(ctx), PowerCommand::removePowerAllomancy)))));
 
 
         LiteralCommandNode<CommandSourceStack> command = dispatcher.register(root);
@@ -90,9 +112,23 @@ public class PowerCommand {
     }
 
     private static void getPowers(CommandContext<CommandSourceStack> ctx, ServerPlayer player) {
-        MutableComponent component = Component.translatable("commands.cosmerecraft.getpowers").append(player.getDisplayName().getString() + ": ");
+        MutableComponent component = Component.translatable("commands.cosmerecraft.getpowers").append(player.getDisplayName().getString() + ": ").append(Component.translatable("commands.cosmerecraft.get_feruchemy"));
         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
             if (data.isFeruchemist()) {
+                component.append(Component.translatable("commands.cosmerecraft.all"));
+            } else if (data.isUninvested()) {
+                component.append(Component.translatable("commands.cosmerecraft.none"));
+            } else {
+                for (Metal mt : Metal.values()) {
+                    if (data.hasPower(mt)) {
+                        component.append(Component.translatable("metals.cosmerecraft."+mt.getName()).append(", "));
+                    }
+                }
+            }
+        });
+        component.append("commands.cosmerecraft.get_allomancy");
+        player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+            if (data.isMistborn()) {
                 component.append(Component.translatable("commands.cosmerecraft.all"));
             } else if (data.isUninvested()) {
                 component.append(Component.translatable("commands.cosmerecraft.none"));
@@ -108,17 +144,27 @@ public class PowerCommand {
         ctx.getSource().sendSuccess(component, true);
     }
 
-    private static void addPower(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
-        handlePowerChange(ctx, player, IFeruchemyData::setFeruchemist, data -> Predicate.not(data::hasPower), mt -> (data -> data.addPower(mt)), ERROR_CANT_ADD::create,
+    private static void addPowerFeruchemy(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
+        handlePowerChangeFeruchemy(ctx, player, IFeruchemyData::setFeruchemist, data -> Predicate.not(data::hasPower), mt -> (data -> data.addPower(mt)), ERROR_CANT_ADD::create,
                 "commands.cosmerecraft.addpower");
     }
 
-    private static void removePower(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
-        handlePowerChange(ctx, player, IFeruchemyData::setUninvested, (data) -> data::hasPower, (mt) -> (data -> data.revokePower(mt)), ERROR_CANT_REMOVE::create,
+    private static void addPowerAllomancy(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
+        handlePowerChangeAllomancy(ctx, player, IAllomancyData::setMistborn, data -> Predicate.not(data::hasPower), mt -> (data -> data.addPower(mt)), ERROR_CANT_ADD::create,
+                "commands.cosmerecraft.addpower");
+    }
+
+    private static void removePowerFeruchemy(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
+        handlePowerChangeFeruchemy(ctx, player, IFeruchemyData::setUninvested, (data) -> data::hasPower, (mt) -> (data -> data.revokePower(mt)), ERROR_CANT_REMOVE::create,
                 "commands.cosmerecraft.removepower");
     }
 
-    private static void handlePowerChange(CommandContext<CommandSourceStack> ctx,
+    private static void removePowerAllomancy(CommandContext<CommandSourceStack> ctx, ServerPlayer player) throws CommandSyntaxException {
+        handlePowerChangeAllomancy(ctx, player, IAllomancyData::setUninvested, (data) -> data::hasPower, (mt) -> (data -> data.revokePower(mt)), ERROR_CANT_REMOVE::create,
+                "commands.cosmerecraft.removepower");
+    }
+
+    private static void handlePowerChangeFeruchemy(CommandContext<CommandSourceStack> ctx,
                                           ServerPlayer player,
                                           NonNullConsumer<IFeruchemyData> all,
                                           Function<IFeruchemyData, Predicate<Metal>> filterFunction,
@@ -142,6 +188,41 @@ public class PowerCommand {
                 Metal mt = Metal.valueOf(type.toUpperCase());
                 if (filter.test(mt)) {
                     player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(single.apply(mt));
+                } else {
+                    throw exception.apply(type);
+                }
+            }
+        }
+        ModMessages.sync(player);
+
+        ctx.getSource().sendSuccess(Component.translatable(success, player.getDisplayName(), type), true);
+
+    }
+
+    private static void handlePowerChangeAllomancy(CommandContext<CommandSourceStack> ctx,
+                                                   ServerPlayer player,
+                                                   NonNullConsumer<IAllomancyData> all,
+                                                   Function<IAllomancyData, Predicate<Metal>> filterFunction,
+                                                   Function<Metal, NonNullConsumer<IAllomancyData>> single,
+                                                   Function<String, CommandSyntaxException> exception,
+                                                   String success) throws CommandSyntaxException {
+
+        String type = ctx.getArgument("type", String.class);
+
+        if (type.equalsIgnoreCase("all")) {
+            player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(all);
+        } else {
+            Predicate<Metal> filter = player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).map(filterFunction::apply).orElse((m) -> false);
+
+            if (type.equalsIgnoreCase("random")) {
+                List<Metal> metalList = Arrays.asList(Metal.values());
+                Collections.shuffle(metalList);
+                Metal mt = metalList.stream().filter(filter).findFirst().orElseThrow(() -> exception.apply(type));
+                player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(single.apply(mt));
+            } else {
+                Metal mt = Metal.valueOf(type.toUpperCase());
+                if (filter.test(mt)) {
+                    player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(single.apply(mt));
                 } else {
                     throw exception.apply(type);
                 }

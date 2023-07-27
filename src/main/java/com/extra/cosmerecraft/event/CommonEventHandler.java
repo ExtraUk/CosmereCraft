@@ -3,6 +3,7 @@ package com.extra.cosmerecraft.event;
 import com.extra.cosmerecraft.CosmereCraft;
 import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
 import com.extra.cosmerecraft.allomancy.data.AllomancerDataProvider;
+import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
@@ -11,7 +12,9 @@ import com.extra.cosmerecraft.item.MetalmindItem;
 import com.extra.cosmerecraft.network.ModMessages;
 import com.google.common.graph.Network;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,6 +26,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Phantom;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -31,6 +35,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.feature.stateproviders.RandomizedIntStateProvider;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -45,10 +51,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.registries.NewRegistryEvent;
 import net.minecraftforge.registries.RegisterEvent;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
 public class CommonEventHandler {
 
@@ -289,6 +297,10 @@ public class CommonEventHandler {
     @SubscribeEvent
     public static void onRespawn(final PlayerEvent.PlayerRespawnEvent event) {
         if (!event.getEntity().getCommandSenderWorld().isClientSide() && event.getEntity() instanceof ServerPlayer player) {
+            player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+                BlockPos pos = player.getLastDeathLocation().get().pos();
+                data.setDeathLoc(pos.getX(), pos.getY(), pos.getZ());
+            });
             ModMessages.sync(player);
         }
     }
@@ -311,6 +323,18 @@ public class CommonEventHandler {
         curPlayer.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
             if (curPlayer instanceof ServerPlayer player) {
                 data.tickBurn(player);
+            }
+
+            if(data.isBurning(Metal.ALUMINUM)){
+                if(curPlayer instanceof ServerPlayer) {
+                    data.wipeReserves((ServerPlayer) curPlayer);
+                }
+            }
+            if(data.isBurning(Metal.PEWTER)){
+                curPlayer.addEffect(new MobEffectInstance(ModEffects.ALLO_PEWTER.get(), 202, 0, false, false, true));
+            }
+            if(data.isBurning(Metal.GOLD)){
+                handleGoldAllomancy(curPlayer, data);
             }
         });
         curPlayer.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
@@ -342,23 +366,13 @@ public class CommonEventHandler {
                 }
             }
 
-            tl = data.tappingLevel(Metal.TIN);
-            if(tl != 0){
-                if(tl < 0){
-                    curPlayer.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 204, 0, false, false, true));
-                }
-                else{
-                    curPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 204, 0, false, false, true));
-                }
-            }
-
             tl = data.tappingLevel(Metal.PEWTER);
             if(tl != 0){
                 if(tl < 0){
                     curPlayer.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 202, -tl-1, false, false, true));
                 }
                 else{
-                    curPlayer.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 202, tl-1, false, false, true));
+                    curPlayer.addEffect(new MobEffectInstance(ModEffects.FERU_PEWTER.get(), 202, tl-1, false, false, true));
                 }
             }
 
@@ -469,6 +483,26 @@ public class CommonEventHandler {
                 }
             }
         });
+    }
+
+    private static void handleGoldAllomancy(Player curPlayer, IAllomancyData data) {
+        BlockPos pos = curPlayer.blockPosition();
+
+        for(Entity entity : curPlayer.getLevel().getEntities(null, new AABB(pos.offset(-6,-6,-6), pos.offset(6,6,6)))){
+            if(entity.getUUID().equals(UUID.fromString(curPlayer.getUUID().toString().replaceAll("^.{3}", "123")))){
+                entity.discard();
+            }
+        }
+        Entity goldShadow = new Zombie(curPlayer.level);
+        Vec3 deathLoc = new Vec3(data.getDeathLoc().x, curPlayer.position().y, data.getDeathLoc().z);
+        Vec3 deathPointingVector = curPlayer.position().add(deathLoc.subtract(curPlayer.position()).normalize().scale(3)); //Increible algebra de vectores
+        goldShadow.setUUID(UUID.fromString(curPlayer.getStringUUID().replaceAll("^.{3}", "123")));
+        CompoundTag nbt = new CompoundTag();
+        nbt.putBoolean("gold_shadow", true);
+        nbt.putUUID("player_UUID", curPlayer.getUUID());
+        goldShadow.deserializeNBT(nbt);
+        goldShadow.setPos(deathPointingVector);
+        curPlayer.getLevel().addFreshEntity(goldShadow);
     }
 
 }

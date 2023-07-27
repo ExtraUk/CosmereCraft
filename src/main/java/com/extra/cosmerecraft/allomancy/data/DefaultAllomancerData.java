@@ -2,14 +2,20 @@ package com.extra.cosmerecraft.allomancy.data;
 
 import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.enums.Metal;
+import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
 import com.extra.cosmerecraft.network.ModMessages;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DefaultAllomancerData implements IAllomancyData {
@@ -21,6 +27,9 @@ public class DefaultAllomancerData implements IAllomancyData {
     private final int[] allomantic_reserves;
     private final int[] max_allomantic_reserves;
     private boolean wasInvested = false;
+    private float deathX = 0;
+    private float deathY = 0;
+    private float deathZ = 0;
 
     public DefaultAllomancerData(){
         int powers = Metal.values().length;
@@ -57,6 +66,7 @@ public class DefaultAllomancerData implements IAllomancyData {
                         int reserves = this.getMetalReserves(metal);
                         if (!this.hasPower(metal) || reserves <= 0) {
                             this.setBurning(metal, false);
+                            removeEffects(player, metal);
                             sync = true;
                         }
                         else {
@@ -114,6 +124,10 @@ public class DefaultAllomancerData implements IAllomancyData {
         }
 
         this.wasInvested = nbt.getBoolean("wasInvested");
+
+        this.deathX = nbt.getFloat("death_x");
+        this.deathY = nbt.getFloat("death_y");
+        this.deathZ = nbt.getFloat("death_z");
     }
 
     @Override
@@ -150,6 +164,10 @@ public class DefaultAllomancerData implements IAllomancyData {
         }
         data.put("metal_burning", metal_burning);
         data.putBoolean("wasInvested", this.wasEverInvested());
+
+        data.putFloat("death_x", this.deathX);
+        data.putFloat("death_y", this.deathY);
+        data.putFloat("death_z", this.deathZ);
 
         return data;
     }
@@ -249,6 +267,7 @@ public class DefaultAllomancerData implements IAllomancyData {
     public void stopBurning(ServerPlayer player) {
         for(Metal metal: Metal.values()){
             this.burning_metals[metal.getIndex()] = false;
+            removeEffects(player, metal);
         }
     }
 
@@ -300,8 +319,9 @@ public class DefaultAllomancerData implements IAllomancyData {
     }
 
     @Override
-    public void wipeReserves() {
+    public void wipeReserves(ServerPlayer player) {
         Arrays.fill(this.allomantic_reserves, 0);
+        ModMessages.sync(this, player);
     }
 
     @Override
@@ -313,5 +333,32 @@ public class DefaultAllomancerData implements IAllomancyData {
         else{
             this.allomantic_reserves[i] = value;
         }
+    }
+
+    @Override
+    public void removeEffects(ServerPlayer player, Metal metal){
+        if(metal == Metal.PEWTER){
+            player.removeEffect(ModEffects.ALLO_PEWTER.get());
+        }
+        if(metal == Metal.GOLD){
+            BlockPos pos = player.blockPosition();
+            for(Entity entity : player.getLevel().getEntities(null, new AABB(pos.offset(-6,-6,-6), pos.offset(6,6,6)))){
+                if(entity.getUUID().equals(UUID.fromString(player.getUUID().toString().replaceAll("^.{3}", "123")))){
+                    entity.discard();
+                }
+            }
+        }
+    }
+
+    @Override
+    public Vec3 getDeathLoc() {
+        return new Vec3(this.deathX, 0, this.deathZ);
+    }
+
+    @Override
+    public void setDeathLoc(int x, int y, int z) {
+        this.deathX = x;
+        this.deathY = y;
+        this.deathZ = z;
     }
 }
