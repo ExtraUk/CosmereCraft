@@ -41,14 +41,14 @@ public class ClientEvents {
                 this.mc.setScreen(new FeruchemySelectScreen());
             }
         }
-        else if(KeyBindings.ALLOMANCY_MENU_KEY.isDown()){
+       /* else if(KeyBindings.ALLOMANCY_MENU_KEY.isDown()){
             if(this.mc.screen instanceof AllomancySelectScreen){
                 this.mc.setScreen(null);
             }
             else {
                 this.mc.setScreen(new AllomancySelectScreen());
             }
-        }
+        }*/
 
     }
 
@@ -101,7 +101,7 @@ public class ClientEvents {
         @SubscribeEvent
         public static void onKeyRegister(RegisterKeyMappingsEvent event){
             event.register(KeyBindings.FERUCHEMY_MENU_KEY);
-            event.register(KeyBindings.ALLOMANCY_MENU_KEY);
+            //event.register(KeyBindings.ALLOMANCY_MENU_KEY);
         }
     }
 }

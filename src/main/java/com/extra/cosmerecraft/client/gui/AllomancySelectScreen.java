@@ -175,11 +175,11 @@ public class AllomancySelectScreen extends Screen {
 
     @Override
     public boolean keyReleased(int keysym, int scancode, int modifiers) {
-        if (KeyBindings.ALLOMANCY_MENU_KEY.matches(keysym, scancode)) {
+        /*if (KeyBindings.ALLOMANCY_MENU_KEY.matches(keysym, scancode)) {
             this.mc.setScreen(null);
             this.mc.mouseHandler.grabMouse();
             return true;
-        }
+        }*/
         return super.keyReleased(keysym, scancode, modifiers);
     }
 
