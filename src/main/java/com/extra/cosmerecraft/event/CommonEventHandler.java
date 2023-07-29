@@ -319,6 +319,9 @@ public class CommonEventHandler {
             if(data.isBurning(Metal.GOLD)){
                 handleGoldAllomancy(curPlayer, data);
             }
+            if(data.isBurning(Metal.ELECTRUM)){
+                handleElectrumAllomancy(curPlayer, data);
+            }
         });
         curPlayer.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
             if (curPlayer instanceof ServerPlayer player) {
@@ -468,6 +471,33 @@ public class CommonEventHandler {
         });
     }
 
+    private static void handleElectrumAllomancy(Player curPlayer, IAllomancyData data) {
+        if(data.getElectrumCooldown() <= 0){
+            BlockPos pos = curPlayer.blockPosition();
+            ResourceLocation skin = data.getSkin();
+            ShadowEntity electrumShadow = ModEntities.SHADOW_ENTITY.get().create(curPlayer.getLevel());
+            Vec3 vectorPosition = new Vec3(pos.getX(), pos.getY(), pos.getZ());
+            Vec3 mov = vectorPosition.subtract(data.getPreviousPos());
+            data.setPreviousPos(vectorPosition);
+            electrumShadow.setUUID(UUID.fromString(curPlayer.getStringUUID().replaceAll("^.{3}", "321")));
+            electrumShadow.setPlayerUUID(curPlayer.getUUID());
+            electrumShadow.setPos(vectorPosition);
+            electrumShadow.setSkin(skin);
+            electrumShadow.setDeathTimer(20);
+            electrumShadow.setMetal(Metal.ELECTRUM);
+            curPlayer.getLevel().addFreshEntity(electrumShadow);
+            Vec3 newPos = vectorPosition.add(mov);
+            electrumShadow.moveTo(newPos.x, newPos.y, newPos.z, curPlayer.getYRot(),curPlayer.getXRot());
+            electrumShadow.setYHeadRot(curPlayer.getYHeadRot());
+
+            data.setElectrumCooldown(21);
+            if(!data.getShadowUUID().equals(electrumShadow.getPlayerUUID())){
+                data.setShadowUUID(electrumShadow.getPlayerUUID());
+                ModMessages.sync(data, (ServerPlayer) curPlayer);
+            }
+        }
+    }
+
     private static void handleGoldAllomancy(Player curPlayer, IAllomancyData data) {
         BlockPos pos = curPlayer.blockPosition();
         ResourceLocation skin = data.getSkin();
@@ -483,6 +513,7 @@ public class CommonEventHandler {
         goldShadow.setPlayerUUID(curPlayer.getUUID());
         goldShadow.setPos(deathPointingVector);
         goldShadow.setSkin(skin);
+        goldShadow.setMetal(Metal.GOLD);
         curPlayer.getLevel().addFreshEntity(goldShadow);
 
         if(!data.getShadowUUID().equals(goldShadow.getPlayerUUID())){

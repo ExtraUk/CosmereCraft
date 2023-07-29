@@ -137,4 +137,12 @@ public interface IAllomancyData {
     UUID getShadowUUID();
 
     void setShadowUUID(UUID uuid);
+
+    int getElectrumCooldown();
+
+    void setElectrumCooldown(int electrumCooldown);
+
+    Vec3 getPreviousPos();
+
+    void setPreviousPos(Vec3 vectorPosition);
 }

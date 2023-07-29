@@ -34,6 +34,8 @@ public class DefaultAllomancerData implements IAllomancyData {
     private float deathZ = 0;
     private ResourceLocation skin;
     private UUID uuid;
+    public int electrumCooldown = 0;
+    private Vec3 prevPos = new Vec3(0,0,0);
 
     public DefaultAllomancerData(){
         int powers = Metal.values().length;
@@ -60,6 +62,7 @@ public class DefaultAllomancerData implements IAllomancyData {
 
     @Override
     public void tickBurn(ServerPlayer player) {
+        if(electrumCooldown > 0) this.electrumCooldown--;
         AtomicInteger FeruchemicalNicrosilTappingLevel = new AtomicInteger();
         FeruchemicalNicrosilTappingLevel.set(0);
         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
@@ -402,5 +405,25 @@ public class DefaultAllomancerData implements IAllomancyData {
     @Override
     public void setShadowUUID(UUID uuid){
         this.uuid = uuid;
+    }
+
+    @Override
+    public int getElectrumCooldown() {
+        return this.electrumCooldown;
+    }
+
+    @Override
+    public void setElectrumCooldown(int electrumCooldown) {
+        this.electrumCooldown = electrumCooldown;
+    }
+
+    @Override
+    public Vec3 getPreviousPos() {
+        return this.prevPos;
+    }
+
+    @Override
+    public void setPreviousPos(Vec3 vectorPosition) {
+        this.prevPos = vectorPosition;
     }
 }

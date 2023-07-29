@@ -67,7 +67,7 @@ public class ClientEvents {
                 AtomicBoolean cancel = new AtomicBoolean(true);
                 this.mc.player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
                     if(data.getShadowUUID().equals(shadow.getPlayerUUID())) {
-                        if (data.isBurning(Metal.GOLD)) {
+                        if (data.isBurning(shadow.getMetal())) {
                             cancel.set(false);
                         }
                     }
