@@ -5,7 +5,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-version = '1.0.1-1.19.2'
+version = '1.1.0-1.19.2'
 group = 'com.extra.cosmerecraft' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'cosmerecraft'
 
@@ -18,6 +18,7 @@ minecraft {
 
     runs {
         client {
+            args '--username', 'ExtraUk'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
             workingDirectory project.file('run')

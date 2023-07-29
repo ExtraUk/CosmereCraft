@@ -3,9 +3,12 @@ package com.extra.cosmerecraft.api.data;
 import com.extra.cosmerecraft.api.enums.Metal;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.UUID;
 
 public interface IAllomancyData {
     /**
@@ -126,4 +129,12 @@ public interface IAllomancyData {
     Vec3 getDeathLoc();
 
     void setDeathLoc(int x, int y, int z);
+
+    void setSkin(ResourceLocation skin);
+
+    ResourceLocation getSkin();
+
+    UUID getShadowUUID();
+
+    void setShadowUUID(UUID uuid);
 }

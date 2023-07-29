@@ -6,16 +6,13 @@ import com.extra.cosmerecraft.allomancy.data.AllomancerDataProvider;
 import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.effect.ModEffects;
+import com.extra.cosmerecraft.entity.ModEntities;
+import com.extra.cosmerecraft.entity.custom.ShadowEntity;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistDataProvider;
 import com.extra.cosmerecraft.item.MetalmindItem;
 import com.extra.cosmerecraft.network.ModMessages;
-import com.google.common.graph.Network;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -26,35 +23,22 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Phantom;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.feature.stateproviders.RandomizedIntStateProvider;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.registries.NewRegistryEvent;
-import net.minecraftforge.registries.RegisterEvent;
-import org.checkerframework.checker.units.qual.C;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -232,7 +216,6 @@ public class CommonEventHandler {
             return;
         }
         if (event.getEntity() instanceof ServerPlayer player) {
-
             player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
                 if (!data.wasEverInvested()) {
                     Random rand = new Random();
@@ -487,22 +470,25 @@ public class CommonEventHandler {
 
     private static void handleGoldAllomancy(Player curPlayer, IAllomancyData data) {
         BlockPos pos = curPlayer.blockPosition();
-
-        for(Entity entity : curPlayer.getLevel().getEntities(null, new AABB(pos.offset(-6,-6,-6), pos.offset(6,6,6)))){
-            if(entity.getUUID().equals(UUID.fromString(curPlayer.getUUID().toString().replaceAll("^.{3}", "123")))){
+        ResourceLocation skin = data.getSkin();
+        for (Entity entity : curPlayer.getLevel().getEntities(null, new AABB(pos.offset(-6, -6, -6), pos.offset(6, 6, 6)))) {
+            if (entity.getUUID().equals(UUID.fromString(curPlayer.getUUID().toString().replaceAll("^.{3}", "123")))) {
                 entity.discard();
             }
         }
-        Entity goldShadow = new Zombie(curPlayer.level);
+        ShadowEntity goldShadow = ModEntities.SHADOW_ENTITY.get().create(curPlayer.getLevel());
         Vec3 deathLoc = new Vec3(data.getDeathLoc().x, curPlayer.position().y, data.getDeathLoc().z);
         Vec3 deathPointingVector = curPlayer.position().add(deathLoc.subtract(curPlayer.position()).normalize().scale(3)); //Increible algebra de vectores
         goldShadow.setUUID(UUID.fromString(curPlayer.getStringUUID().replaceAll("^.{3}", "123")));
-        CompoundTag nbt = new CompoundTag();
-        nbt.putBoolean("gold_shadow", true);
-        nbt.putUUID("player_UUID", curPlayer.getUUID());
-        goldShadow.deserializeNBT(nbt);
+        goldShadow.setPlayerUUID(curPlayer.getUUID());
         goldShadow.setPos(deathPointingVector);
+        goldShadow.setSkin(skin);
         curPlayer.getLevel().addFreshEntity(goldShadow);
+
+        if(!data.getShadowUUID().equals(goldShadow.getPlayerUUID())){
+            data.setShadowUUID(goldShadow.getPlayerUUID());
+            ModMessages.sync(data, (ServerPlayer) curPlayer);
+        }
     }
 
 }

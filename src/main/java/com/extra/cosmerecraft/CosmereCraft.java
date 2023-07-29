@@ -10,6 +10,10 @@ import com.extra.cosmerecraft.command.CommandSetup;
 import com.extra.cosmerecraft.command.FeruchemyPowerType;
 import com.extra.cosmerecraft.command.PowerCommand;
 import com.extra.cosmerecraft.effect.ModEffects;
+import com.extra.cosmerecraft.entity.ModEntities;
+import com.extra.cosmerecraft.entity.client.ShadowModel;
+import com.extra.cosmerecraft.entity.client.ShadowRenderer;
+import com.extra.cosmerecraft.entity.custom.ShadowEntity;
 import com.extra.cosmerecraft.event.ClientEvents;
 import com.extra.cosmerecraft.event.CommonEventHandler;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
@@ -25,6 +29,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -34,8 +39,10 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.loot.LootModifier;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
@@ -72,9 +79,11 @@ public class CosmereCraft
         ModRecipes.register(modEventBus);
         ModConfiguredFeatures.register(modEventBus);
         ModPlacedFeatures.register(modEventBus);
+        ModEntities.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::enqueueIMC);
         modEventBus.addListener(CosmereCraft::init);
+        modEventBus.addListener(CosmereCraft::entityAttributes);
         modEventBus.addListener(FeruchemistCapability::registerCapability);
         modEventBus.addListener(AllomancerCapability::registerCapability);
 
@@ -103,6 +112,16 @@ public class CosmereCraft
             MinecraftForge.EVENT_BUS.register(new ClientEvents());
             MenuScreens.register(ModMenuTypes.ALLOYING_FURNACE_MENU.get(), AlloyingFurnaceScreen::new);
         }
+
+        @SubscribeEvent
+        public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event){
+            event.registerEntityRenderer(ModEntities.SHADOW_ENTITY.get(), ShadowRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event){
+            event.registerLayerDefinition(ShadowModel.LAYER_LOCATION, ShadowModel::createBodyLayer);
+        }
     }
 
     public static final CreativeModeTab SCADRIAL_TAB = new CreativeModeTab("scadrial_tab") {
@@ -117,5 +136,9 @@ public class CosmereCraft
         e.enqueueWork(() -> {
             MinecraftForge.EVENT_BUS.register(CommonEventHandler.class);
         });
+    }
+
+    public static void entityAttributes(final EntityAttributeCreationEvent event){
+        event.put(ModEntities.SHADOW_ENTITY.get(), ShadowEntity.getShadowAttributes().build());
     }
 }

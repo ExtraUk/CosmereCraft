@@ -6,8 +6,10 @@ import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
 import com.extra.cosmerecraft.network.ModMessages;
+import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +32,8 @@ public class DefaultAllomancerData implements IAllomancyData {
     private float deathX = 0;
     private float deathY = 0;
     private float deathZ = 0;
+    private ResourceLocation skin;
+    private UUID uuid;
 
     public DefaultAllomancerData(){
         int powers = Metal.values().length;
@@ -48,6 +52,10 @@ public class DefaultAllomancerData implements IAllomancyData {
 
         this.max_allomantic_reserves = new int[powers];
         Arrays.fill(this.max_allomantic_reserves, 24000);
+
+        this.skin = DefaultPlayerSkin.getDefaultSkin();
+
+        this.uuid = UUID.randomUUID();
     }
 
     @Override
@@ -128,6 +136,10 @@ public class DefaultAllomancerData implements IAllomancyData {
         this.deathX = nbt.getFloat("death_x");
         this.deathY = nbt.getFloat("death_y");
         this.deathZ = nbt.getFloat("death_z");
+
+        this.skin = new ResourceLocation(nbt.getString("skin"));
+
+        this.uuid = nbt.getUUID("uuid");
     }
 
     @Override
@@ -169,6 +181,9 @@ public class DefaultAllomancerData implements IAllomancyData {
         data.putFloat("death_y", this.deathY);
         data.putFloat("death_z", this.deathZ);
 
+        data.putString("skin", this.skin.toString());
+
+        data.putUUID("uuid", this.uuid);
         return data;
     }
 
@@ -210,7 +225,9 @@ public class DefaultAllomancerData implements IAllomancyData {
 
     @Override
     public void setMistborn() {
-        Arrays.fill(this.allomantic_powers, true);
+        for(Metal metal: Metal.values()){
+            this.addPower(metal);
+        }
     }
 
     @Override
@@ -225,7 +242,12 @@ public class DefaultAllomancerData implements IAllomancyData {
 
     @Override
     public void addPower(Metal metal) {
-        this.allomantic_powers[metal.getIndex()] = true;
+        if(this.allomantic_powers[metal.getIndex()]){
+            this.max_allomantic_reserves[metal.getIndex()] += 6000;
+        }
+        else{
+            this.allomantic_powers[metal.getIndex()] = true;
+        }
     }
 
     @Override
@@ -360,5 +382,25 @@ public class DefaultAllomancerData implements IAllomancyData {
         this.deathX = x;
         this.deathY = y;
         this.deathZ = z;
+    }
+
+    @Override
+    public void setSkin(ResourceLocation skin){
+        this.skin = skin;
+    }
+
+    @Override
+    public ResourceLocation getSkin(){
+        return this.skin;
+    }
+
+    @Override
+    public UUID getShadowUUID() {
+        return this.uuid;
+    }
+
+    @Override
+    public void setShadowUUID(UUID uuid){
+        this.uuid = uuid;
     }
 }

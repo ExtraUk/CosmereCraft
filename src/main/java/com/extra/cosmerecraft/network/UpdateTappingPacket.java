@@ -47,13 +47,16 @@ public class UpdateTappingPacket {
             player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
                 int tappingLevel = this.level+this.mouseButton;
                 if (data.hasPower(this.mt)){
-                    data.setTappingLevel(this.mt, tappingLevel);
                     if(this.mt == Metal.ATIUM) {
                         player.hurt(DamageSource.GENERIC, (float) 0.001);
                     }
-                    if(this.mt == Metal.CADMIUM && tappingLevel < 0){
+                    else if(this.mt == Metal.CADMIUM && tappingLevel < 0){
                         player.setAirSupply(player.getAirSupply()+tappingLevel);
                     }
+                    else if(this.mt == Metal.NICROSIL){
+                        data.stopTapping(player);
+                    }
+                    data.setTappingLevel(this.mt, tappingLevel);
                 }
                 else {
                     data.setTappingLevel(this.mt, 0);
