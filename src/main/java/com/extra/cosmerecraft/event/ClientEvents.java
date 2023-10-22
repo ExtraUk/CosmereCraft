@@ -17,12 +17,19 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.VibrationParticleOption;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.gameevent.EntityPositionSource;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.event.PlayLevelSoundEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -57,6 +64,28 @@ public class ClientEvents {
             }
         }
 
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public void onPlaySound(PlayLevelSoundEvent.AtPosition event){
+        SoundSource source = event.getSource();
+        Vec3 soundPosition = event.getPosition();
+        if(source == SoundSource.HOSTILE || source == SoundSource.PLAYERS || source == SoundSource.NEUTRAL || source == SoundSource.VOICE) {
+            for (Entity entity : event.getLevel().getEntities(null, new AABB(soundPosition.subtract(25, 25, 25), event.getPosition().add(25, 25, 25)))) {
+                if (entity instanceof Player player) {
+                    if(soundPosition.distanceTo(player.position()) > 1)
+                    player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+                        if (data.isBurning(Metal.TIN)) {
+                            event.getLevel().addAlwaysVisibleParticle(
+                                new VibrationParticleOption(new EntityPositionSource(player, 1.5f), 30),
+                                soundPosition.x, soundPosition.y, soundPosition.z,
+                                0, 0, 0);
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -331,6 +331,9 @@ public class CommonEventHandler {
                     data.wipeReserves((ServerPlayer) curPlayer);
                 }
             }
+            if(data.isBurning(Metal.TIN)){
+                curPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 206, 5, false, false, true));
+            }
             if(data.isBurning(Metal.PEWTER)){
                 curPlayer.addEffect(new MobEffectInstance(ModEffects.ALLO_PEWTER.get(), 202, 0, false, false, true));
             }

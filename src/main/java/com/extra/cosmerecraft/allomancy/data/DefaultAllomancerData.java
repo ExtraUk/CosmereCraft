@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -372,6 +373,9 @@ public class DefaultAllomancerData implements IAllomancyData {
                     entity.discard();
                 }
             }
+        }
+        if(metal == Metal.TIN){
+            player.removeEffect(MobEffects.NIGHT_VISION);
         }
     }
 
