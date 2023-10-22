@@ -53,7 +53,7 @@ public class UpdateTappingPacket {
                     else if(this.mt == Metal.CADMIUM && tappingLevel < 0){
                         player.setAirSupply(player.getAirSupply()+tappingLevel);
                     }
-                    else if(this.mt == Metal.NICROSIL){
+                    else if(this.mt == Metal.NICROSIL && this.level < 0){
                         data.stopTapping(player);
                     }
                     data.setTappingLevel(this.mt, tappingLevel);

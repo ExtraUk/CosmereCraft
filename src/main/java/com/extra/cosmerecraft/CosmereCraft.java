@@ -16,6 +16,7 @@ import com.extra.cosmerecraft.entity.client.ShadowRenderer;
 import com.extra.cosmerecraft.entity.custom.ShadowEntity;
 import com.extra.cosmerecraft.event.ClientEvents;
 import com.extra.cosmerecraft.event.CommonEventHandler;
+import com.extra.cosmerecraft.event.LootTableInjector;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
 import com.extra.cosmerecraft.loot.LootModifierRegistry;
@@ -135,6 +136,7 @@ public class CosmereCraft
         e.enqueueWork(ModMessages::registerPackets);
         e.enqueueWork(() -> {
             MinecraftForge.EVENT_BUS.register(CommonEventHandler.class);
+            MinecraftForge.EVENT_BUS.register(LootTableInjector.class);
         });
     }
 

@@ -10,12 +10,11 @@ import com.extra.cosmerecraft.entity.ModEntities;
 import com.extra.cosmerecraft.entity.custom.ShadowEntity;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistDataProvider;
-import com.extra.cosmerecraft.item.MetalmindItem;
+import com.extra.cosmerecraft.item.LerasiumBeadItem;
 import com.extra.cosmerecraft.network.ModMessages;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -28,10 +27,14 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.entries.LootTableReference;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
@@ -41,6 +44,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Random;
 import java.util.UUID;
+
 
 public class CommonEventHandler {
 
@@ -207,6 +211,20 @@ public class CommonEventHandler {
     public static void onEntityJump(final LivingEvent.LivingJumpEvent event){
         if(event.getEntity().hasEffect(ModEffects.HEAVY.get())){
             event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().x, event.getEntity().getDeltaMovement().y - ((float)event.getEntity().getEffect(ModEffects.HEAVY.get()).getAmplifier()+1)/20, event.getEntity().getDeltaMovement().z);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityFinishUsingItem(final LivingEntityUseItemEvent.Finish event){
+        if(event.getItem().getItem() instanceof LerasiumBeadItem bead){
+            event.getEntity().getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
+                if(bead.isPureLerasium()){
+                    data.setMistborn();
+                }
+                else{
+                    data.addPower(bead.getMetal());
+                }
+            });
         }
     }
 
