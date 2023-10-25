@@ -19,6 +19,7 @@ import com.extra.cosmerecraft.event.CommonEventHandler;
 import com.extra.cosmerecraft.event.LootTableInjector;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
+import com.extra.cosmerecraft.item.VialItem;
 import com.extra.cosmerecraft.loot.LootModifierRegistry;
 import com.extra.cosmerecraft.network.ModMessages;
 import com.extra.cosmerecraft.recipe.ModRecipes;
@@ -31,9 +32,11 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -137,6 +140,7 @@ public class CosmereCraft
         e.enqueueWork(() -> {
             MinecraftForge.EVENT_BUS.register(CommonEventHandler.class);
             MinecraftForge.EVENT_BUS.register(LootTableInjector.class);
+            ItemProperties.register(ModItems.VIAL.get(), new ResourceLocation("cosmerecraft:has_metals"), new VialItem.VialHasMetalsPropertyFunction());
         });
     }
 

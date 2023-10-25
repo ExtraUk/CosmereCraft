@@ -6,6 +6,7 @@ import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.item.ModItems;
 import com.extra.cosmerecraft.network.ModMessages;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -102,6 +103,9 @@ public class DefaultAllomancerData implements IAllomancyData {
         CompoundTag defaultMetals = (CompoundTag) nbt.get("defaultMetals");
         CompoundTag nicrosilMetals = (CompoundTag) nbt.get("nicrosilMetals");
         CompoundTag hemalurgyMetals = (CompoundTag) nbt.get("hemalurgyMetals");
+        CompoundTag max_allomantic_reserves = (CompoundTag) nbt.get("max_allomantic_reserves");
+        CompoundTag allomantic_reserves = (CompoundTag) nbt.get("allomantic_reserves");
+        CompoundTag metal_burning = (CompoundTag) nbt.get("metal_burning");
         for (Metal mt : Metal.values()) {
             if (defaultMetals.getBoolean(mt.getName())) {
                 this.addPower(mt);
@@ -118,20 +122,8 @@ public class DefaultAllomancerData implements IAllomancyData {
             } else {
                 this.revokePowerHemalurgy(mt);
             }
-        }
-
-        CompoundTag max_allomantic_reserves = (CompoundTag) nbt.get("max_allomantic_reserves");
-        for (Metal mt : Metal.values()) {
             this.max_allomantic_reserves[mt.getIndex()] = max_allomantic_reserves.getInt(mt.getName());
-        }
-
-        CompoundTag allomantic_reserves = (CompoundTag) nbt.get("allomantic_reserves");
-        for (Metal mt : Metal.values()) {
             this.setMetalReserves(mt, allomantic_reserves.getInt(mt.getName()));
-        }
-
-        CompoundTag metal_burning = (CompoundTag) nbt.get("metal_burning");
-        for (Metal mt : Metal.values()) {
             this.setBurning(mt, metal_burning.getBoolean(mt.getName()));
         }
 
@@ -153,31 +145,22 @@ public class DefaultAllomancerData implements IAllomancyData {
         CompoundTag defaultMetals = new CompoundTag();
         CompoundTag nicrosilMetals = new CompoundTag();
         CompoundTag hemalurgyMetals = new CompoundTag();
+        CompoundTag allomantic_reserves = new CompoundTag();
+        CompoundTag max_allomantic_reserves = new CompoundTag();
+        CompoundTag metal_burning = new CompoundTag();
         for (Metal mt : Metal.values()) {
             defaultMetals.putBoolean(mt.getName(), this.hasPowerDefault(mt));
             nicrosilMetals.putBoolean(mt.getName(), this.hasPowerNicrosil(mt));
             hemalurgyMetals.putBoolean(mt.getName(), this.hasPowerHemalurgy(mt));
+            allomantic_reserves.putInt(mt.getName(), this.getMetalReserves(mt));
+            max_allomantic_reserves.putInt(mt.getName(), this.getMetalMaxReserves(mt));
+            metal_burning.putBoolean(mt.getName(), this.isBurning(mt));
         }
         data.put("defaultMetals", defaultMetals);
         data.put("nicrosilMetals", nicrosilMetals);
         data.put("hemalurgyMetals", hemalurgyMetals);
-
-        CompoundTag allomantic_reserves = new CompoundTag();
-        for (Metal mt : Metal.values()) {
-            allomantic_reserves.putInt(mt.getName(), this.getMetalReserves(mt));
-        }
         data.put("allomantic_reserves", allomantic_reserves);
-
-        CompoundTag max_allomantic_reserves = new CompoundTag();
-        for (Metal mt : Metal.values()) {
-            max_allomantic_reserves.putInt(mt.getName(), this.getMetalReserves(mt));
-        }
         data.put("max_allomantic_reserves", max_allomantic_reserves);
-
-        CompoundTag metal_burning = new CompoundTag();
-        for (Metal mt : Metal.values()) {
-            metal_burning.putBoolean(mt.getName(), this.isBurning(mt));
-        }
         data.put("metal_burning", metal_burning);
         data.putBoolean("wasInvested", this.wasEverInvested());
 
@@ -311,6 +294,7 @@ public class DefaultAllomancerData implements IAllomancyData {
         else{
             this.allomantic_reserves[metal.getIndex()] = newReserves;
         }
+        ModMessages.sync(this, player);
     }
 
     @Override
@@ -352,13 +336,11 @@ public class DefaultAllomancerData implements IAllomancyData {
 
     @Override
     public void setMetalReserves(Metal metal, int value) {
-        int i = metal.getIndex();
-        if(value > this.max_allomantic_reserves[i]){
-            this.allomantic_reserves[i] = this.max_allomantic_reserves[i];
-        }
-        else{
-            this.allomantic_reserves[i] = value;
-        }
+        this.allomantic_reserves[metal.getIndex()] += value;
+    }
+
+    public int getMetalMaxReserves(Metal metal){
+        return this.max_allomantic_reserves[metal.getIndex()];
     }
 
     @Override

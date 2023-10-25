@@ -3,6 +3,9 @@ package com.extra.cosmerecraft.item;
 import com.extra.cosmerecraft.CosmereCraft;
 import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.api.enums.OreMetal;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -21,31 +24,6 @@ public class ModItems {
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);
     }
-
-    static{
-        for(OreMetal metal: OreMetal.values()){
-            rawOres.add(ITEMS.register("raw_" + metal.getName(), () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB))));
-        }
-
-        for(Metal metal: Metal.values()){
-            ITEMS.register(metal.getName()+"_ring", () -> new MetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), metal, true));
-            ITEMS.register(metal.getName()+"_bracelet", () -> new MetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), metal, false));
-        }
-    }
-
-    public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register("steel_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> TIN_INGOT = ITEMS.register("tin_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> PEWTER_INGOT = ITEMS.register("pewter_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> ZINC_INGOT = ITEMS.register("zinc_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> BRASS_INGOT = ITEMS.register("brass_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> BRONZE_INGOT = ITEMS.register("bronze_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> ALUMINUM_INGOT = ITEMS.register("aluminum_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> DURALUMIN_INGOT = ITEMS.register("duralumin_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> CHROMIUM_INGOT = ITEMS.register("chromium_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> NICROSIL_INGOT = ITEMS.register("nicrosil_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> ELECTRUM_INGOT = ITEMS.register("electrum_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> CADMIUM_INGOT = ITEMS.register("cadmium_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
-    public static final RegistryObject<Item> BENDALLOY_INGOT = ITEMS.register("bendalloy_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
 
     public static final RegistryObject<Item> BISMUTH_INGOT = ITEMS.register("bismuth_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
     public static final RegistryObject<Item> NICKEL_INGOT = ITEMS.register("nickel_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
@@ -72,5 +50,22 @@ public class ModItems {
     public static final RegistryObject<Item> LERASCADIUM_BEAD = ITEMS.register("lerascadium_bead", () -> new LerasiumBeadItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), Metal.CADMIUM, false));
     public static final RegistryObject<Item> LERASBICADIUM_BEAD = ITEMS.register("lerasbicadium_bead", () -> new LerasiumBeadItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), Metal.BENDALLOY, false));
 
+    public static final RegistryObject<Item> VIAL = ITEMS.register("vial", () -> new VialItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB).stacksTo(16)));
 
+    static{
+        for(OreMetal metal: OreMetal.values()){
+            rawOres.add(ITEMS.register("raw_" + metal.getName(), () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB))));
+        }
+
+        for(Metal metal: Metal.values()){
+            ITEMS.register(metal.getName()+"_ring", () -> new MetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), metal, true));
+            ITEMS.register(metal.getName()+"_bracelet", () -> new MetalmindItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), metal, false));
+            if(!metal.equals(Metal.ATIUM)) {
+                if(!metal.isVanilla()) {
+                    ITEMS.register(metal.getName() + "_ingot", () -> new Item(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB)));
+                }
+                ITEMS.register(metal.getName()+"_flakes", () -> new FlakeItem(new Item.Properties().tab(CosmereCraft.SCADRIAL_TAB), metal));
+            }
+        }
+    }
 }

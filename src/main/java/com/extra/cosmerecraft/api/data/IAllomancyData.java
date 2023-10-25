@@ -34,6 +34,8 @@ public interface IAllomancyData {
 
     boolean hasPowerDefault(Metal metal);
 
+    public int getMetalMaxReserves(Metal metal);
+
     /**
      * Get the number of powers the player has
      *
@@ -118,11 +120,11 @@ public interface IAllomancyData {
 
     void wipeReserves(ServerPlayer player);
 
-    public void setMetalReserves(Metal metal, int value);
-
     void load(CompoundTag nbt);
 
     CompoundTag save();
+
+    void setMetalReserves(Metal metal, int value);
 
     void removeEffects(ServerPlayer player, Metal mt);
 
@@ -145,4 +147,5 @@ public interface IAllomancyData {
     Vec3 getPreviousPos();
 
     void setPreviousPos(Vec3 vectorPosition);
+
 }

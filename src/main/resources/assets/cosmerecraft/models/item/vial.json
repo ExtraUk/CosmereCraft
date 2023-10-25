@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "cosmerecraft:item/vial"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "cosmerecraft:has_metals": 1
+      },
+      "model": "cosmerecraft:item/vial_metals"
+    }
+  ]
+}
