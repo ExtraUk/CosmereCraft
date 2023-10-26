@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "cosmerecraft:lerasium_bead"
+    },
+    {
+      "item": "cosmerecraft:electrum_ingot"
+    }
+  ],
+  "result": {
+    "item": "cosmerecraft:lerasargaurium_bead",
+    "count": 1
+  }
+}
