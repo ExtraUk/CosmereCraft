@@ -23,6 +23,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -33,6 +35,7 @@ import net.minecraftforge.event.PlayLevelSoundEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientEvents {
@@ -71,14 +74,15 @@ public class ClientEvents {
     public void onPlaySound(PlayLevelSoundEvent.AtPosition event){
         SoundSource source = event.getSource();
         Vec3 soundPosition = event.getPosition();
-        if(source == SoundSource.HOSTILE || source == SoundSource.PLAYERS || source == SoundSource.NEUTRAL || source == SoundSource.VOICE) {
-            for (Entity entity : event.getLevel().getEntities(null, new AABB(soundPosition.subtract(25, 25, 25), event.getPosition().add(25, 25, 25)))) {
+        short radius = 40;
+        if(source == SoundSource.HOSTILE || source == SoundSource.PLAYERS || source == SoundSource.NEUTRAL || source == SoundSource.VOICE || source == SoundSource.BLOCKS) {
+            for (Entity entity : event.getLevel().getEntities(null, new AABB(soundPosition.subtract(radius, radius, radius), event.getPosition().add(radius, radius, radius)))) {
                 if (entity instanceof Player player) {
                     if(soundPosition.distanceTo(player.position()) > 1)
                     player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
                         if (data.isBurning(Metal.TIN)) {
                             event.getLevel().addAlwaysVisibleParticle(
-                                new VibrationParticleOption(new EntityPositionSource(player, 1.5f), 30),
+                                new VibrationParticleOption(new EntityPositionSource(player, 1.5f), (int)(5*soundPosition.distanceTo(player.position()))),
                                 soundPosition.x, soundPosition.y, soundPosition.z,
                                 0, 0, 0);
                         }
@@ -142,21 +146,18 @@ public class ClientEvents {
             return;
         }
         player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
-
-            PoseStack stack = setupPoseStack(event);
-            double rho = 1; //Se agradece
-            float theta = (float) ((this.mc.player.getViewYRot(event.getPartialTick()) + 90) * Math.PI / 180);
-            float phi = Mth.clamp((float) ((this.mc.player.getViewXRot(event.getPartialTick()) + 90) * Math.PI / 180), 0.0001F, 3.14F);
-
-            Vec3 playerPos = this.mc.cameraEntity
-                    .getEyePosition(event.getPartialTick())
-                    .add(rho * Mth.sin(phi) * Mth.cos(theta), rho * Mth.cos(phi) - 0.35F, rho * Mth.sin(phi) * Mth.sin(theta));
-
             if(data.isBurning(Metal.IRON) || data.isBurning(Metal.STEEL)){
-                drawLine(stack, playerPos, new Vec3(0,0,0), 0,0,1);
-            }
+                PoseStack stack = setupPoseStack(event);
+                double rho = 1; //Se agradece
+                float theta = (float) ((this.mc.player.getViewYRot(event.getPartialTick()) + 90) * Math.PI / 180);
+                float phi = Mth.clamp((float) ((this.mc.player.getViewXRot(event.getPartialTick()) + 90) * Math.PI / 180), 0.0001F, 3.14F);
 
-            teardownPoseStack(stack);
+                Vec3 playerPos = this.mc.cameraEntity
+                        .getEyePosition(event.getPartialTick())
+                        .add(rho * Mth.sin(phi) * Mth.cos(theta), rho * Mth.cos(phi) - 0.35F, rho * Mth.sin(phi) * Mth.sin(theta));
+                drawLine(stack, playerPos, new Vec3(0,0,0), 0,0,1);
+                teardownPoseStack(stack);
+            }
         });
 
     }

@@ -50,27 +50,27 @@ public class VialItem extends Item {
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving) {
         super.finishUsingItem(pStack, pLevel, pEntityLiving);
         if (!pLevel.isClientSide) {
-            chargeMetals(pStack, (ServerPlayer)pEntityLiving);
-        }
-        if (pStack.isEmpty()) {
-            return new ItemStack(ModItems.VIAL.get());
-        } else {
-            if (pEntityLiving instanceof Player && !((Player)pEntityLiving).getAbilities().instabuild) {
-                ItemStack itemstack = new ItemStack(ModItems.VIAL.get());
-                Player player = (Player)pEntityLiving;
-                if (!player.getInventory().add(itemstack)) {
-                    player.drop(itemstack, false);
+            chargeMetals(pStack, (ServerPlayer) pEntityLiving);
+            if (pStack.isEmpty()) {
+                return new ItemStack(ModItems.VIAL.get());
+            } else {
+                if (pEntityLiving instanceof Player && !((Player) pEntityLiving).getAbilities().instabuild) {
+                    ItemStack itemstack = new ItemStack(ModItems.VIAL.get());
+                    Player player = (Player) pEntityLiving;
+                    if (!player.getInventory().add(itemstack)) {
+                        player.drop(itemstack, false);
+                    }
+                    pStack.shrink(1);
                 }
             }
-
-            return pStack;
         }
+        return pStack;
     }
 
     public void chargeMetals(ItemStack pStack, ServerPlayer player){
         player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
             for(Metal metal : Metal.values()){
-                data.setMetalReserves(metal, Math.min(data.getMetalMaxReserves(metal), pStack.getOrCreateTag().getInt(metal.getName())));
+                data.setMetalReserves(metal, Math.min(data.getMetalMaxReserves(metal), data.getMetalReserves(metal) + pStack.getOrCreateTag().getInt(metal.getName())*1500));
             }
         });
     }
@@ -80,7 +80,7 @@ public class VialItem extends Item {
         for(Metal metal : Metal.values()){
             int metalCharge = stack.getOrCreateTag().getInt(metal.getName());
             if(metalCharge > 0){
-                components.add(Component.translatable("metals.cosmerecraft."+metal.getName()).append(": "+metalCharge));
+                components.add(Component.translatable("metals.cosmerecraft."+metal.getName()).append(": "+metalCharge*75));
             }
         }
 

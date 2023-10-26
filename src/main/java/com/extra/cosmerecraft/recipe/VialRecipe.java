@@ -50,7 +50,7 @@ public class VialRecipe extends CustomRecipe {
         vial.setCount(1);
         for(Metal metal: Metal.values()){
             if(flakes[metal.getIndex()] > 0){
-                vial.getOrCreateTag().putInt(metal.getName(), Math.min(vial.getOrCreateTag().getInt(metal.getName()) + 16*flakes[metal.getIndex()], 256));
+                vial.getOrCreateTag().putInt(metal.getName(), Math.min(vial.getOrCreateTag().getInt(metal.getName()) + flakes[metal.getIndex()], 16));
             }
         }
         return vial;

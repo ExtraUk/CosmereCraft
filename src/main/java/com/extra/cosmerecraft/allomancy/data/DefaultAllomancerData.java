@@ -336,7 +336,7 @@ public class DefaultAllomancerData implements IAllomancyData {
 
     @Override
     public void setMetalReserves(Metal metal, int value) {
-        this.allomantic_reserves[metal.getIndex()] += value;
+        this.allomantic_reserves[metal.getIndex()] = value;
     }
 
     public int getMetalMaxReserves(Metal metal){
