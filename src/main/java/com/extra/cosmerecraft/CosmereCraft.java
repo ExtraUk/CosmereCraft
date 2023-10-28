@@ -6,6 +6,7 @@ import com.extra.cosmerecraft.block.entity.ModBlockEntities;
 import com.extra.cosmerecraft.client.KeyBindings;
 import com.extra.cosmerecraft.client.gui.AlloyingFurnaceScreen;
 import com.extra.cosmerecraft.client.gui.ModMenuTypes;
+import com.extra.cosmerecraft.client.particle.ModParticles;
 import com.extra.cosmerecraft.command.CommandSetup;
 import com.extra.cosmerecraft.command.FeruchemyPowerType;
 import com.extra.cosmerecraft.command.PowerCommand;
@@ -84,6 +85,7 @@ public class CosmereCraft
         ModConfiguredFeatures.register(modEventBus);
         ModPlacedFeatures.register(modEventBus);
         ModEntities.register(modEventBus);
+        ModParticles.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::enqueueIMC);
         modEventBus.addListener(CosmereCraft::init);

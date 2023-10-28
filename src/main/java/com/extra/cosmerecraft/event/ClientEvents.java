@@ -6,6 +6,7 @@ import com.extra.cosmerecraft.api.enums.Metal;
 import com.extra.cosmerecraft.client.KeyBindings;
 import com.extra.cosmerecraft.client.gui.AllomancySelectScreen;
 import com.extra.cosmerecraft.client.gui.FeruchemySelectScreen;
+import com.extra.cosmerecraft.client.particle.option.TinParticleOption;
 import com.extra.cosmerecraft.entity.client.ShadowModel;
 import com.extra.cosmerecraft.entity.custom.ShadowEntity;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
@@ -76,13 +77,13 @@ public class ClientEvents {
         Vec3 soundPosition = event.getPosition();
         short radius = 40;
         if(source == SoundSource.HOSTILE || source == SoundSource.PLAYERS || source == SoundSource.NEUTRAL || source == SoundSource.VOICE || source == SoundSource.BLOCKS) {
-            for (Entity entity : event.getLevel().getEntities(null, new AABB(soundPosition.subtract(radius, radius, radius), event.getPosition().add(radius, radius, radius)))) {
+            for (Entity entity : event.getLevel().getEntities(null, new AABB(soundPosition.subtract(radius, radius, radius), soundPosition.add(radius, radius, radius)))) {
                 if (entity instanceof Player player) {
                     if(soundPosition.distanceTo(player.position()) > 1)
                     player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
                         if (data.isBurning(Metal.TIN)) {
                             event.getLevel().addAlwaysVisibleParticle(
-                                new VibrationParticleOption(new EntityPositionSource(player, 1.5f), (int)(5*soundPosition.distanceTo(player.position()))),
+                                new TinParticleOption(new EntityPositionSource(player, 1.5f), (int)(3*soundPosition.distanceTo(player.position())), source),
                                 soundPosition.x, soundPosition.y, soundPosition.z,
                                 0, 0, 0);
                         }
