@@ -1,6 +1,7 @@
 package com.extra.cosmerecraft.event;
 
 import com.extra.cosmerecraft.CosmereCraft;
+import com.extra.cosmerecraft.client.particle.BronzeParticle;
 import com.extra.cosmerecraft.client.particle.ModParticles;
 import com.extra.cosmerecraft.client.particle.TinParticle;
 import net.minecraft.client.Minecraft;
@@ -15,5 +16,6 @@ public class ModEventBusEvents {
     @SubscribeEvent
     public static void registerParticleFactories(RegisterParticleProvidersEvent event){
         Minecraft.getInstance().particleEngine.register(ModParticles.TIN_PARTICLE.get(), TinParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(ModParticles.BRONZE_PARTICLE.get(), BronzeParticle.Provider::new);
     }
 }

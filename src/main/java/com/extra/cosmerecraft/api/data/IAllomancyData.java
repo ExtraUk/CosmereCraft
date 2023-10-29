@@ -148,4 +148,7 @@ public interface IAllomancyData {
 
     void setPreviousPos(Vec3 vectorPosition);
 
+    int getBronzeCooldown();
+
+    void resetBronzeCooldown();
 }

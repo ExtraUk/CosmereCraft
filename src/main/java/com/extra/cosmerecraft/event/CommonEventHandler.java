@@ -5,6 +5,9 @@ import com.extra.cosmerecraft.allomancy.data.AllomancerCapability;
 import com.extra.cosmerecraft.allomancy.data.AllomancerDataProvider;
 import com.extra.cosmerecraft.api.data.IAllomancyData;
 import com.extra.cosmerecraft.api.enums.Metal;
+import com.extra.cosmerecraft.api.enums.Power;
+import com.extra.cosmerecraft.client.particle.option.BronzeParticleOption;
+import com.extra.cosmerecraft.client.particle.option.TinParticleOption;
 import com.extra.cosmerecraft.effect.ModEffects;
 import com.extra.cosmerecraft.entity.ModEntities;
 import com.extra.cosmerecraft.entity.custom.ShadowEntity;
@@ -27,6 +30,7 @@ import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.EntityPositionSource;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.entries.LootTableReference;
@@ -343,6 +347,9 @@ public class CommonEventHandler {
             if(data.isBurning(Metal.ELECTRUM)){
                 handleElectrumAllomancy(curPlayer, data);
             }
+            if(data.isBurning(Metal.BRONZE)){
+                handleBronzeAllomancy(curPlayer, data);
+            }
         });
         curPlayer.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
             if (curPlayer instanceof ServerPlayer player) {
@@ -516,6 +523,38 @@ public class CommonEventHandler {
                 data.setShadowUUID(electrumShadow.getPlayerUUID());
                 ModMessages.sync(data, (ServerPlayer) curPlayer);
             }
+        }
+    }
+
+    private static void handleBronzeAllomancy(Player curPlayer, IAllomancyData data){
+        if (data.getBronzeCooldown() <= 0) {
+            for(Player player : curPlayer.level.players()){
+                System.out.println("Cuack");
+                Vec3 playerPos = player.position();
+                double distance = playerPos.distanceTo(curPlayer.position());
+                if(distance < 30 && distance > 0){
+                    for(Metal metal: Metal.values()) {
+                        player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(playerData -> {
+                            if(playerData.isBurning(metal)) {
+                                System.out.println(metal);
+                                curPlayer.level.addAlwaysVisibleParticle(
+                                        new BronzeParticleOption(new EntityPositionSource(curPlayer, 1.5f), (int) (3 * distance), Power.ALLOMANCY, metal.getIndex()),
+                                        playerPos.x, playerPos.y, playerPos.z,
+                                        0, 0, 0);
+                            }
+                        });
+                        player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(playerData -> {
+                            if(playerData.tappingLevel(metal) > 0) {
+                                curPlayer.level.addAlwaysVisibleParticle(
+                                        new BronzeParticleOption(new EntityPositionSource(curPlayer, 1.5f), (int) (3 * distance), Power.FERUCHEMY, metal.getIndex()),
+                                        playerPos.x, playerPos.y, playerPos.z,
+                                        0, 0, 0);
+                            }
+                        });
+                    }
+                }
+            }
+            data.resetBronzeCooldown();
         }
     }
 

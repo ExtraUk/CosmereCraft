@@ -1,6 +1,7 @@
 package com.extra.cosmerecraft.client.particle;
 
 import com.extra.cosmerecraft.CosmereCraft;
+import com.extra.cosmerecraft.client.particle.option.BronzeParticleOption;
 import com.extra.cosmerecraft.client.particle.option.TinParticleOption;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -24,6 +25,16 @@ public class ModParticles {
         @Override
         public Codec<TinParticleOption> codec() {
             return tinParticleCodecFactory.apply(this);
+        }
+    });
+
+    final static Function<ParticleType<BronzeParticleOption>, Codec<BronzeParticleOption>> bronzeParticleCodecFactory = (p_235904_) -> {
+        return BronzeParticleOption.CODEC;
+    };
+    public static final RegistryObject<ParticleType<BronzeParticleOption>> BRONZE_PARTICLE = PARTICLE_TYPES.register("bronze_particle", ()-> new ParticleType<>(true, BronzeParticleOption.DESERIALIZER) {
+        @Override
+        public Codec<BronzeParticleOption> codec() {
+            return bronzeParticleCodecFactory.apply(this);
         }
     });
 
