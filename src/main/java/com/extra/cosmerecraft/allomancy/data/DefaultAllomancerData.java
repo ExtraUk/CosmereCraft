@@ -40,6 +40,10 @@ public class DefaultAllomancerData implements IAllomancyData {
     private Vec3 prevPos = new Vec3(0,0,0);
     private final int BRONZE_COOLDOWN_SECONDS = 5;
     private int bronzeCooldown = BRONZE_COOLDOWN_SECONDS*20;
+    private final int COPPER_CLOUD_COOLDOWN = 5;
+    private int copperCloudCooldown = 0;
+    private final int HIDDEN_ALLOMANCY_DURATION = 6;
+    private int hiddenAllomancyDuration = 0;
 
     public DefaultAllomancerData(){
         int powers = Metal.values().length;
@@ -68,6 +72,8 @@ public class DefaultAllomancerData implements IAllomancyData {
     public void tickBurn(ServerPlayer player) {
         if(electrumCooldown > 0) this.electrumCooldown--;
         if(bronzeCooldown > 0) this.bronzeCooldown--;
+        if(copperCloudCooldown > 0) this.copperCloudCooldown--;
+        if(hiddenAllomancyDuration > 0) this.hiddenAllomancyDuration--;
         AtomicInteger FeruchemicalNicrosilTappingLevel = new AtomicInteger();
         FeruchemicalNicrosilTappingLevel.set(0);
         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
@@ -424,5 +430,25 @@ public class DefaultAllomancerData implements IAllomancyData {
     @Override
     public void resetBronzeCooldown() {
         this.bronzeCooldown = 20*BRONZE_COOLDOWN_SECONDS;
+    }
+
+    @Override
+    public int getCopperCloudCooldown() {
+        return this.copperCloudCooldown;
+    }
+
+    @Override
+    public void resetCopperCloudCooldown() {
+        this.copperCloudCooldown = this.COPPER_CLOUD_COOLDOWN*20;
+    }
+
+    @Override
+    public int getHiddenAllomancyDuration() {
+        return this.hiddenAllomancyDuration;
+    }
+
+    @Override
+    public void resetHiddenAllomancyDuration() {
+        this.hiddenAllomancyDuration = this.HIDDEN_ALLOMANCY_DURATION*20;
     }
 }

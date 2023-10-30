@@ -151,4 +151,12 @@ public interface IAllomancyData {
     int getBronzeCooldown();
 
     void resetBronzeCooldown();
+
+    int getCopperCloudCooldown();
+
+    void resetCopperCloudCooldown();
+
+    int getHiddenAllomancyDuration();
+
+    void resetHiddenAllomancyDuration();
 }
