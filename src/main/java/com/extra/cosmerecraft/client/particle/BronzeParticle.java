@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.VibrationParticleOption;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.gameevent.PositionSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,7 +33,7 @@ public class BronzeParticle extends TextureSheetParticle {
         this.target = pTarget;
         this.lifetime = pLifetime;
 
-        this.setColor(power.getRed(), power.getGreen(), power.getGreen());
+        this.setColor(power.getRed(), power.getGreen(), power.getBlue());
         //set sprite using powerOrd
     }
 
@@ -80,7 +81,15 @@ public class BronzeParticle extends TextureSheetParticle {
 
         public Particle createParticle(BronzeParticleOption pType, ClientLevel pLevel, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
             BronzeParticle bronzeParticle = new BronzeParticle(pLevel, pX, pY, pZ, pType.getDestination(), pType.getArrivalInTicks(), pType.getPower(), pType.getPowerOrdinal());
-            bronzeParticle.pickSprite(this.sprite);
+            final int TEXTURES_AMOUNT = 35;
+            switch (pType.getPower()) {
+                case ALLOMANCY -> bronzeParticle.setSprite(this.sprite.get(1+pType.getPowerOrdinal(), TEXTURES_AMOUNT));
+                case FERUCHEMY -> bronzeParticle.setSprite(this.sprite.get(19 + pType.getPowerOrdinal(), TEXTURES_AMOUNT));
+                case SURGEBINDING -> bronzeParticle.setSprite(this.sprite.get(35 + pType.getPowerOrdinal(), TEXTURES_AMOUNT));
+                case AONDOR -> bronzeParticle.setSprite(this.sprite.get(45 + pType.getPowerOrdinal(), TEXTURES_AMOUNT));
+                case AWAKENING -> bronzeParticle.setSprite(this.sprite.get(46 + pType.getPowerOrdinal(), TEXTURES_AMOUNT));
+                default -> bronzeParticle.pickSprite(this.sprite);
+            }
             bronzeParticle.setAlpha(1.0F);
             return bronzeParticle;
         }

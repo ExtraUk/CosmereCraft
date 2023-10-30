@@ -15,6 +15,7 @@ import com.extra.cosmerecraft.feruchemy.data.FeruchemistCapability;
 import com.extra.cosmerecraft.feruchemy.data.FeruchemistDataProvider;
 import com.extra.cosmerecraft.item.LerasiumBeadItem;
 import com.extra.cosmerecraft.network.ModMessages;
+import com.extra.cosmerecraft.network.SpawnParticleClient;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -45,6 +46,7 @@ import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.Random;
 import java.util.UUID;
@@ -529,26 +531,18 @@ public class CommonEventHandler {
     private static void handleBronzeAllomancy(Player curPlayer, IAllomancyData data){
         if (data.getBronzeCooldown() <= 0) {
             for(Player player : curPlayer.level.players()){
-                System.out.println("Cuack");
                 Vec3 playerPos = player.position();
                 double distance = playerPos.distanceTo(curPlayer.position());
                 if(distance < 30 && distance > 0){
                     for(Metal metal: Metal.values()) {
                         player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(playerData -> {
                             if(playerData.isBurning(metal)) {
-                                System.out.println(metal);
-                                curPlayer.level.addAlwaysVisibleParticle(
-                                        new BronzeParticleOption(new EntityPositionSource(curPlayer, 1.5f), (int) (3 * distance), Power.ALLOMANCY, metal.getIndex()),
-                                        playerPos.x, playerPos.y, playerPos.z,
-                                        0, 0, 0);
+                                ModMessages.sendToPlayer(new SpawnParticleClient(playerPos.x, playerPos.y, playerPos.z, Power.ALLOMANCY, metal.getIndex()), (ServerPlayer) curPlayer);
                             }
                         });
                         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(playerData -> {
                             if(playerData.tappingLevel(metal) > 0) {
-                                curPlayer.level.addAlwaysVisibleParticle(
-                                        new BronzeParticleOption(new EntityPositionSource(curPlayer, 1.5f), (int) (3 * distance), Power.FERUCHEMY, metal.getIndex()),
-                                        playerPos.x, playerPos.y, playerPos.z,
-                                        0, 0, 0);
+                                ModMessages.sendToPlayer(new SpawnParticleClient(playerPos.x, playerPos.y, playerPos.z, Power.FERUCHEMY, metal.getIndex()), (ServerPlayer) curPlayer);
                             }
                         });
                     }

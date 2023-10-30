@@ -1,5 +1,39 @@
 {
   "textures": [
-    "cosmerecraft:bronze_particle"
+    "cosmerecraft:iron_allomancy",
+    "cosmerecraft:steel_allomancy",
+    "cosmerecraft:tin_allomancy",
+    "cosmerecraft:pewter_allomancy",
+    "cosmerecraft:zinc_allomancy",
+    "cosmerecraft:brass_allomancy",
+    "cosmerecraft:copper_allomancy",
+    "cosmerecraft:bronze_allomancy",
+    "cosmerecraft:aluminum_allomancy",
+    "cosmerecraft:duralumin_allomancy",
+    "cosmerecraft:chromium_allomancy",
+    "cosmerecraft:nicrosil_allomancy",
+    "cosmerecraft:gold_allomancy",
+    "cosmerecraft:electrum_allomancy",
+    "cosmerecraft:cadmium_allomancy",
+    "cosmerecraft:bendalloy_allomancy",
+    "cosmerecraft:atium_allomancy",
+
+    "cosmerecraft:iron_feruchemy",
+    "cosmerecraft:steel_feruchemy",
+    "cosmerecraft:tin_feruchemy",
+    "cosmerecraft:pewter_feruchemy",
+    "cosmerecraft:zinc_feruchemy",
+    "cosmerecraft:brass_feruchemy",
+    "cosmerecraft:copper_feruchemy",
+    "cosmerecraft:bronze_feruchemy",
+    "cosmerecraft:aluminum_feruchemy",
+    "cosmerecraft:duralumin_feruchemy",
+    "cosmerecraft:chromium_feruchemy",
+    "cosmerecraft:nicrosil_feruchemy",
+    "cosmerecraft:gold_feruchemy",
+    "cosmerecraft:electrum_feruchemy",
+    "cosmerecraft:cadmium_feruchemy",
+    "cosmerecraft:bendalloy_feruchemy",
+    "cosmerecraft:atium_feruchemy"
   ]
 }

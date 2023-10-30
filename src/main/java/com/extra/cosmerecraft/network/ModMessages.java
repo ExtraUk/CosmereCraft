@@ -27,6 +27,7 @@ public class ModMessages {
         INSTANCE.registerMessage(id(), AllomancerDataPacket.class, AllomancerDataPacket::encode, AllomancerDataPacket::decode, AllomancerDataPacket::handle);
         INSTANCE.registerMessage(id(), UpdateBurnPacket.class, UpdateBurnPacket::encode, UpdateBurnPacket::decode, UpdateBurnPacket::handle);
         INSTANCE.registerMessage(id(), UpdateSkinPacket.class, UpdateSkinPacket::encode, UpdateSkinPacket::decode, UpdateSkinPacket::handle);
+        INSTANCE.registerMessage(id(), SpawnParticleClient.class, SpawnParticleClient::encode, SpawnParticleClient::decode, SpawnParticleClient::handle);
     }
 
     public static <MSG> void sendToServer(MSG message){
