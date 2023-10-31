@@ -44,6 +44,8 @@ public class DefaultAllomancerData implements IAllomancyData {
     private int copperCloudCooldown = 0;
     private final int HIDDEN_ALLOMANCY_DURATION = 6;
     private int hiddenAllomancyDuration = 0;
+    private boolean isEnhanced = false;
+    private int enhancedHiddenAllomancyDuration = 0;
 
     public DefaultAllomancerData(){
         int powers = Metal.values().length;
@@ -74,6 +76,7 @@ public class DefaultAllomancerData implements IAllomancyData {
         if(bronzeCooldown > 0) this.bronzeCooldown--;
         if(copperCloudCooldown > 0) this.copperCloudCooldown--;
         if(hiddenAllomancyDuration > 0) this.hiddenAllomancyDuration--;
+        if(enhancedHiddenAllomancyDuration > 0) this.enhancedHiddenAllomancyDuration--;
         AtomicInteger FeruchemicalNicrosilTappingLevel = new AtomicInteger();
         FeruchemicalNicrosilTappingLevel.set(0);
         player.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
@@ -450,5 +453,36 @@ public class DefaultAllomancerData implements IAllomancyData {
     @Override
     public void resetHiddenAllomancyDuration() {
         this.hiddenAllomancyDuration = this.HIDDEN_ALLOMANCY_DURATION*20;
+    }
+
+    @Override
+    public boolean isEnhanced() {
+        return isEnhanced;
+    }
+
+    @Override
+    public void setEnhanced(boolean enhanced){
+        this.isEnhanced = enhanced;
+    }
+
+    @Override
+    public void wipeBurningReserves(ServerPlayer player){
+        for(Metal metal: Metal.values()){
+            if(isBurning(metal)){
+                this.setMetalReserves(metal, 0);
+                this.setBurning(metal, false);
+            }
+        }
+        ModMessages.sync(this, player);
+    }
+
+    @Override
+    public boolean isEnhanceHidden() {
+        return this.enhancedHiddenAllomancyDuration > 0;
+    }
+
+    @Override
+    public void resetEnhancedHiddenAllomancyDuration() {
+        this.enhancedHiddenAllomancyDuration = 20*HIDDEN_ALLOMANCY_DURATION;
     }
 }

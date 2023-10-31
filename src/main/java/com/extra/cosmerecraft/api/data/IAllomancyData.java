@@ -159,4 +159,14 @@ public interface IAllomancyData {
     int getHiddenAllomancyDuration();
 
     void resetHiddenAllomancyDuration();
+
+    boolean isEnhanced();
+
+    void setEnhanced(boolean enhanced);
+
+    void wipeBurningReserves(ServerPlayer player);
+
+    boolean isEnhanceHidden();
+
+    void resetEnhancedHiddenAllomancyDuration();
 }

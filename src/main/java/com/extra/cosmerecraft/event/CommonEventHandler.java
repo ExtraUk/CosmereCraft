@@ -319,6 +319,11 @@ public class CommonEventHandler {
     }
 
     private static void playerPowerTick(Player curPlayer, Level level) {
+        allomancyTick(curPlayer, level);
+        feruchemyTick(curPlayer, level);
+    }
+
+    private static void allomancyTick(Player curPlayer, Level level){
         curPlayer.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(data -> {
             if (curPlayer instanceof ServerPlayer player) {
                 data.tickBurn(player);
@@ -329,26 +334,59 @@ public class CommonEventHandler {
                     data.wipeReserves((ServerPlayer) curPlayer);
                 }
             }
-            if(data.isBurning(Metal.TIN)){
-                curPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 206, 5, false, false, true));
-            }
-            if(data.isBurning(Metal.PEWTER)){
-                curPlayer.addEffect(new MobEffectInstance(ModEffects.ALLO_PEWTER.get(), 202, 0, false, false, true));
-            }
             if(data.isBurning(Metal.GOLD)){
                 handleGoldAllomancy(curPlayer, data);
             }
             if(data.isBurning(Metal.ELECTRUM)){
                 handleElectrumAllomancy(curPlayer, data);
             }
-            if(data.isBurning(Metal.BRONZE)){
-                handleBronzeAllomancy(curPlayer, data);
+            if(data.isBurning(Metal.DURALUMIN)){
+                data.setEnhanced(true);
             }
-            if(data.isBurning(Metal.COPPER)){
-                data.resetHiddenAllomancyDuration();
-                updateCopperCloud(curPlayer, data);
+            else{
+                data.setEnhanced(false);
+            }
+
+            if(!data.isEnhanced()){
+                if(data.isBurning(Metal.TIN)){
+                    curPlayer.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 206, 5, false, false, true));
+                }
+                if(data.isBurning(Metal.PEWTER)){
+                    curPlayer.addEffect(new MobEffectInstance(ModEffects.ALLO_PEWTER.get(), 202, 0, false, false, true));
+                }
+
+                if(data.isBurning(Metal.BRONZE)){
+                    handleBronzeAllomancy(curPlayer, data, false);
+                }
+                if(data.isBurning(Metal.COPPER)){
+                    data.resetHiddenAllomancyDuration();
+                    updateCopperCloud(curPlayer, data, false);
+                }
+            }
+            else{
+                if(data.isBurning(Metal.TIN)){
+                    data.removeEffects((ServerPlayer) curPlayer, Metal.TIN);
+                    curPlayer.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 5, false, false, true));
+                }
+                if(data.isBurning(Metal.PEWTER)){
+                    data.removeEffects((ServerPlayer) curPlayer, Metal.PEWTER);
+                    curPlayer.addEffect(new MobEffectInstance(ModEffects.ALLO_PEWTER.get(), 60, data.getMetalReserves(Metal.PEWTER)/4800, false, false, true));
+                }
+
+                if(data.isBurning(Metal.BRONZE)){
+                    handleBronzeAllomancy(curPlayer, data, true);
+                }
+                if(data.isBurning(Metal.COPPER)){
+                    data.resetHiddenAllomancyDuration();
+                    data.resetEnhancedHiddenAllomancyDuration();
+                    updateCopperCloud(curPlayer, data, true);
+                }
+                data.wipeBurningReserves((ServerPlayer) curPlayer);
             }
         });
+    }
+
+    private static void feruchemyTick(Player curPlayer, Level level){
         curPlayer.getCapability(FeruchemistCapability.PLAYER_CAP_FERUCHEMY).ifPresent(data -> {
             if (curPlayer instanceof ServerPlayer player) {
                 data.tickTapStore(player);
@@ -497,13 +535,19 @@ public class CommonEventHandler {
         });
     }
 
-    private static void updateCopperCloud(Player curPlayer, IAllomancyData data) {
+    private static void updateCopperCloud(Player curPlayer, IAllomancyData data, boolean isEnhanced) {
         if(data.getCopperCloudCooldown() <= 0){
             data.resetCopperCloudCooldown();
             for(Player player: curPlayer.level.players()){
                 if(curPlayer.position().distanceTo(player.position()) < 7){
                     player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(playerData -> {
-                        playerData.resetHiddenAllomancyDuration();
+                        if(isEnhanced){
+                            playerData.resetHiddenAllomancyDuration();
+                            playerData.resetEnhancedHiddenAllomancyDuration();
+                        }
+                        else{
+                            playerData.resetHiddenAllomancyDuration();
+                        }
                     });
                 }
             }
@@ -537,13 +581,17 @@ public class CommonEventHandler {
         }
     }
 
-    private static void handleBronzeAllomancy(Player curPlayer, IAllomancyData data){
-        if (data.getBronzeCooldown() <= 0) {
+    private static void handleBronzeAllomancy(Player curPlayer, IAllomancyData data, boolean isEnhanced){
+        if (data.getBronzeCooldown() <= 0 || isEnhanced) {
             for(Player player : curPlayer.level.players()){
-                AtomicBoolean bool = new AtomicBoolean(true);
+                AtomicBoolean isHidden = new AtomicBoolean(false);
+                boolean isBurningCopper = data.isBurning(Metal.COPPER);
+                AtomicBoolean isEnhanceHidden = new AtomicBoolean(false);
                 player.getCapability(AllomancerCapability.PLAYER_CAP_ALLOMANCY).ifPresent(playerData -> {
-                            bool.set(playerData.getHiddenAllomancyDuration() <= 0);});
-                if(bool.get()) {
+                    isHidden.set(playerData.getHiddenAllomancyDuration() > 0);
+                    isEnhanceHidden.set(playerData.isEnhanceHidden());
+                });
+                if((!isHidden.get() && !isBurningCopper) || (isEnhanced && !isEnhanceHidden.get())) {
                     Vec3 playerPos = player.position();
                     double distance = playerPos.distanceTo(curPlayer.position());
                     if (distance < 30 && distance > 0) {
